@@ -16,7 +16,9 @@
 "else"               { return _ELSE; }
 "class"              { return _CLASS; }
 "return"             { return _RETURN; }
+"new"                { return _NEW; }
 
+"."                  { return _DOT; }
 ","                  { return _COMMA; }
 "("                  { return _LPAREN; }
 ")"                  { return _RPAREN; }

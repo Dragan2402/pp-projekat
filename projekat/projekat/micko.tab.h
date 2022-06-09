@@ -44,19 +44,21 @@
      _ELSE = 260,
      _RETURN = 261,
      _CLASS = 262,
-     _ID = 263,
-     _INT_NUMBER = 264,
-     _UINT_NUMBER = 265,
-     _LPAREN = 266,
-     _RPAREN = 267,
-     _LBRACKET = 268,
-     _RBRACKET = 269,
-     _ASSIGN = 270,
-     _SEMICOLON = 271,
-     _COMMA = 272,
-     _AROP = 273,
-     _RELOP = 274,
-     ONLY_IF = 275
+     _NEW = 263,
+     _ID = 264,
+     _INT_NUMBER = 265,
+     _UINT_NUMBER = 266,
+     _LPAREN = 267,
+     _RPAREN = 268,
+     _LBRACKET = 269,
+     _RBRACKET = 270,
+     _ASSIGN = 271,
+     _SEMICOLON = 272,
+     _DOT = 273,
+     _COMMA = 274,
+     _AROP = 275,
+     _RELOP = 276,
+     ONLY_IF = 277
    };
 #endif
 
@@ -75,7 +77,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 79 "micko.tab.h"
+#line 81 "micko.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

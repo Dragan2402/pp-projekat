@@ -36,6 +36,7 @@
 %token _ELSE
 %token _RETURN
 %token _CLASS
+%token _NEW
 %token <s> _ID
 %token <s> _INT_NUMBER
 %token <s> _UINT_NUMBER
@@ -45,6 +46,7 @@
 %token _RBRACKET
 %token _ASSIGN
 %token _SEMICOLON
+%token _DOT
 %token _COMMA
 %token <i> _AROP
 %token <i> _RELOP
@@ -54,6 +56,8 @@
 
 %nonassoc ONLY_IF
 %nonassoc _ELSE
+
+
 
 %%
 
@@ -76,7 +80,7 @@ classes_existing_list
   ;
 
 class
-  : _CLASS _ID _LBRACKET attributes_list constructor { isClass=1; } function_list _RBRACKET ;
+  : _CLASS _ID _LBRACKET attributes_list constructor { isClass=1; } functions_list _RBRACKET ;
 
 attributes_list
   :
@@ -85,6 +89,10 @@ attributes_list
 
 attribute
   : _TYPE _ID _SEMICOLON;
+
+functions_list
+  : 
+  | function_list;
 
 function_list
   : function
@@ -115,6 +123,7 @@ attribute_assign_list
 
 attribute_assign
   : _ID _ASSIGN _ID _SEMICOLON
+  | _ID _ASSIGN literal _SEMICOLON
   ;
 
 
@@ -191,7 +200,27 @@ statement
   : compound_statement
   | assignment_statement
   | if_statement
+  | class_declaration
   | return_statement
+  ;
+
+class_declaration
+  : _CLASS _ID _ID _ASSIGN _NEW _ID _LPAREN class_argument_list _RPAREN _SEMICOLON
+  ;
+
+
+class_argument_list
+  : /* empty */
+  | class_arguments
+  ;
+
+class_arguments
+  : class_argument
+  | class_arguments _COMMA class_argument
+  ;
+
+class_argument
+  : num_exp
   ;
 
 compound_statement
@@ -236,7 +265,11 @@ num_exp
 
 exp
   : literal
-
+  | _ID _DOT function_call
+    {
+      $$ = take_reg();
+      gen_mov(FUN_REG, $$);
+    }
   | _ID
       {
         if( isClass==0){
@@ -245,12 +278,11 @@ exp
             err("'%s' undeclared", $1);
         }
       }
-
   | function_call
       {
         $$ = take_reg();
         gen_mov(FUN_REG, $$);
-      }
+      }  
   
   | _LPAREN num_exp _RPAREN
       { $$ = $2; }

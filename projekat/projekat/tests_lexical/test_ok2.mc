@@ -4,6 +4,7 @@ class Dragan {
     int atribut2;
     int atribut3;
     int dostaAtributaDragane;
+    Dragan(){}
 }
 
 int main() {

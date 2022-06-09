@@ -9,7 +9,7 @@ class Dragan {
         atribut2 = par2;
         atribut3= par3;
         dostaAtributaDragane = par4;        
-    }
+        }
 }
 
 int main() {
