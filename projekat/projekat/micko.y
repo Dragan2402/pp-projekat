@@ -1,6 +1,7 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
+  #include <string.h>
   #include "defs.h"
   #include "symtab.h"
   #include "codegen.h"
@@ -17,12 +18,13 @@
   int warning_count = 0;
   int var_num = 0;
   int fun_idx = -1;
+  int class_idx = -1;
   int fcall_idx = -1;
   int lab_num = -1;
   int* parameter_map[128];
   int arg_counter = 0;
   int isClass = 0;
-
+  int attributes_counter=0;
   FILE *output;
 %}
 
@@ -62,7 +64,7 @@
 %%
 
 program
-  : classes_list { isClass=0; } function_list
+  : { isClass=1; } classes_list { isClass=0; } function_list
       {  
         if(lookup_symbol("main", FUN) == NO_INDEX)
           err("undefined reference to 'main'");
@@ -80,7 +82,25 @@ classes_existing_list
   ;
 
 class
-  : _CLASS _ID _LBRACKET attributes_list constructor { isClass=1; } functions_list _RBRACKET ;
+  : _CLASS _ID {
+        class_idx = lookup_symbol($2, CLASS);
+        if(class_idx == NO_INDEX){
+          class_idx = insert_symbol($2, CLASS, NO_TYPE, NO_ATR, NO_ATR);
+          int* param_types = (int*) malloc(sizeof(int)*128);
+          parameter_map[class_idx] = param_types;
+          }
+        else 
+          err("redefinition of class '%s'", $2);
+        attributes_counter=0;
+  }
+    _LBRACKET attributes_list constructor { 
+       if( arg_counter != get_atr1(class_idx)){
+        err("Invalid number of arguments in constructor, arguments '%d', attributes '%d'",arg_counter,attributes_counter);
+       }
+     } functions_list _RBRACKET {
+      clear_symbols(class_idx+1);
+      attributes_counter=0;
+    } ;
 
 attributes_list
   :
@@ -88,7 +108,21 @@ attributes_list
   ;
 
 attribute
-  : _TYPE _ID _SEMICOLON;
+  : _TYPE _ID {
+      {
+        if(lookup_symbol($2, ATR) == NO_INDEX){
+          insert_symbol($2, ATR, $1, attributes_counter, NO_ATR);
+          attributes_counter = get_atr1(class_idx);
+          int* param_types = parameter_map[class_idx];
+          param_types[attributes_counter] = $1;
+          attributes_counter += 1;
+          set_atr1(class_idx, attributes_counter); OVDE SI STAO NASTAVI DALJE POTREBNO JE UBACITI VALIDACIJU ARGUEMANATA I DODJELU PA ONDA FUNKCIJE
+           }
+        else 
+           err("redefinition of '%s'", $2);
+      }
+
+  } _SEMICOLON;
 
 functions_list
   : 
@@ -100,7 +134,14 @@ function_list
   ;
 
 constructor
-  : _ID _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list _RBRACKET;
+  : _ID {
+    char* class_name = get_name(class_idx);
+    char* id = $1;
+    int ret = strcmp(class_name,id);
+    if (ret < 0 ){
+      err("Inavlid constructor name '%s', class name '%s'",$1,get_name(class_idx));
+    }
+  } _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list _RBRACKET;
 
 constructor_parameters
   :
@@ -114,6 +155,13 @@ constructor_existing_parameters
 
 constructor_parameter
   : _TYPE _ID
+    {
+      if(lookup_symbol($2, PAR) != -1){
+        err("Redefinition of parameter %s ", $2);
+      }
+      insert_symbol($2, PAR, $1, 1, NO_ATR);
+      ++arg_counter;
+    }
   ;
 
 
