@@ -22,7 +22,7 @@ int get_last_element(void);
 // i vraca indeks ubacenog elementa u tabeli simbola 
 // ili -1 u slucaju da nema slobodnog elementa u tabeli.
 int insert_symbol(char *name, unsigned kind, unsigned type, 
-                  unsigned atr1, unsigned atr2);
+                  unsigned atr1, unsigned atr2,unsigned atr3);
 
 // Ubacuje konstantu u tabelu simbola (ako vec ne postoji).
 int insert_literal(char *str, unsigned type);

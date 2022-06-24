@@ -17,11 +17,17 @@
   int error_count = 0;
   int warning_count = 0;
   int var_num = 0;
+
   int fun_idx = -1;
   int class_idx = -1;
+  int current_class_idx = -1;
+  int current_instance_idx= -1;
+  int instance_declaration_arg_counter = 0;
+
   int fcall_idx = -1;
-  int class_instanceIDX=-1;
+  int instance_index=-1;
   int lab_num = -1;
+
   int* parameter_map[128];
   int arg_counter = 0;
   int isClass = 0;
@@ -84,12 +90,11 @@ classes_existing_list
 
 class
   : _CLASS _ID {
-        class_idx = lookup_symbol($2, CLASS);
-        if(class_idx == NO_INDEX){
-          class_idx = insert_symbol($2, CLASS, NO_TYPE, NO_ATR, NO_ATR);
+        current_class_idx = lookup_symbol($2, CLAS);
+        if(current_class_idx == NO_INDEX){
+          current_class_idx = insert_symbol($2, CLAS, NO_TYPE, 0, NO_ATR,NO_ATR);
           int* param_types = (int*) malloc(sizeof(int)*128);
-          print_symtab();
-          parameter_map[class_idx] = param_types;
+          parameter_map[current_class_idx] = param_types;
           }
         else 
           err("redefinition of class '%s'", $2);
@@ -99,6 +104,7 @@ class
        if( arg_counter != get_atr1(class_idx)){
         err("Invalid number of arguments in constructor, arguments '%d', attributes '%d'",arg_counter,attributes_counter);
        }
+       
      } functions_list _RBRACKET {
       arg_counter=0;
       attributes_counter=0;
@@ -114,25 +120,23 @@ attribute
       {
         int atr_idx = lookup_symbol($2, ATR);
         if(atr_idx == NO_INDEX){
-          int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR);
-          set_atr3(idx,class_idx);
-          attributes_counter = get_atr1(class_idx);
-          int* param_types = parameter_map[class_idx];
+          int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
+          attributes_counter = get_atr1(current_class_idx);
+          int* param_types = parameter_map[current_class_idx];
           param_types[attributes_counter] = $1;
           attributes_counter += 1;
-          set_atr1(class_idx, attributes_counter); 
+          set_atr1(current_class_idx, attributes_counter); 
            }
         else 
-         if(get_atr3(atr_idx)==class_idx){
+         if(get_atr3(atr_idx)==current_class_idx){
            err("redefinition of '%s'", $2);
           }else{
-            int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR);
-            set_atr3(idx,class_idx);
-            attributes_counter = get_atr1(class_idx);
-            int* param_types = parameter_map[class_idx];
+            int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
+            attributes_counter = get_atr1(current_class_idx);
+            int* param_types = parameter_map[current_class_idx];
             param_types[attributes_counter] = $1;
             attributes_counter += 1;
-            set_atr1(class_idx, attributes_counter); 
+            set_atr1(current_class_idx, attributes_counter); 
           }
       }
 
@@ -149,16 +153,16 @@ function_list
 
 constructor
   : _ID {
-    char* class_name = get_name(class_idx);
+    char* class_name = get_name(current_class_idx);
     char* id = $1;
     int ret = strcmp(class_name,id);
     if (ret < 0 ){
-      err("Inavlid constructor name '%s', class name '%s'",$1,get_name(class_idx));
+      err("Inavlid constructor name '%s', class name '%s'",$1,get_name(current_class_idx));
     }
     arg_counter = 0 ;
-  } _LPAREN  constructor_parameters _RPAREN _LBRACKET attribute_assign_list {
-  
-    clear_symbols(get_last_element() - attributes_counter+1);
+  } _LPAREN  constructor_parameters _RPAREN _LBRACKET attribute_assign_list {  
+    clear_symbols(get_last_element() - arg_counter +1);
+    arg_counter = 0 ;
   } _RBRACKET;
 
 constructor_parameters
@@ -174,15 +178,30 @@ constructor_existing_parameters
 constructor_parameter
   : _TYPE _ID
     {
-      if(lookup_symbol($2, PAR|ATR) != -1){
+      if(lookup_symbol($2, PAR) != -1){
         err("Redefinition of parameter %s ", $2);
+      }else{
+        int indx_atr=lookup_symbol($2,ATR);
+        if(indx_atr != NO_INDEX){
+          if(get_atr3(indx_atr) == current_class_idx){
+            err("Redefinition of attribute %s ", $2);
+          }else{
+            int* param_types = parameter_map[current_class_idx];
+            if(param_types[arg_counter] != $1){
+              err("inavlid constructor parameter, paramtere type '%d', attribute type '%d'", $1, param_types[arg_counter]);
+            }
+            insert_symbol($2, PAR, $1, arg_counter , NO_ATR,current_class_idx);
+            ++arg_counter;
+          }
+        }else{
+          int* param_types = parameter_map[current_class_idx];
+          if(param_types[arg_counter] != $1){
+            err("inavlid constructor parameter, paramtere type '%d', attribute type '%d'",$1,param_types[arg_counter]);
+          }
+          insert_symbol($2, PAR, $1, arg_counter, NO_ATR,current_class_idx);
+          ++arg_counter;
+        }
       }
-      int* param_types = parameter_map[class_idx];
-      if(param_types[arg_counter] != $1){
-        err("inavlid constructor parameter, paramtere type '%d', attribute type '%d'",$1,param_types[arg_counter]);
-      }
-      insert_symbol($2, PAR, $1, 1, NO_ATR);
-      ++arg_counter;
     }
   ;
 
@@ -198,9 +217,15 @@ attribute_assign
       if(idx == NO_INDEX)
         err("unknown attribute '%s' in class", $1);
       else{
-        int idx_par = lookup_symbol($3,PAR);
-        if(get_type(idx) != get_type(idx_par))
-          err("incompatible types in assignment of attribute");
+        if(get_atr3(idx) == current_class_idx){
+          int idx_par = lookup_symbol($3,PAR);
+          if(get_type(idx) != get_type(idx_par))
+            err("incompatible types in assignment of attribute");
+          if(get_atr3(idx_par)!=current_class_idx)
+            err("parametar '%s' not from this class",$3);
+        }else{
+          err("unknown attribute '%s' in class", $1);
+        }
       }
     }
   ;
@@ -212,27 +237,28 @@ function
         if (isClass==0){
             fun_idx = lookup_symbol($2, FUN);
             if(fun_idx == NO_INDEX)
-              fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
-            else 
-              err("redefinition of function '%s'", $2);
+              fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,NO_ATR);
+            else
+              if(get_atr3(fun_idx) == NO_ATR){
+                fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,NO_ATR);
+              }else{
+                err("redefinition of function '%s'", $2);
+                }
 
             code("\n%s:", $2);
             code("\n\t\tPUSH\t%%14");
             code("\n\t\tMOV \t%%15,%%14");
         }
         else{
-           
             fun_idx = lookup_symbol($2, FUN);
             if(fun_idx == NO_INDEX){
-              fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
-              set_atr3(fun_idx,class_idx);
+              fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,current_class_idx);   
             }
             else {
-              if(get_atr3(fun_idx) == class_idx){
-                err("redefinition of function '%s' in class '%s", $2, get_name(class_idx));
+              if(get_atr3(fun_idx) == current_class_idx){
+                err("redefinition of function '%s' in class '%s", $2, get_name(current_class_idx));
               }else{
-                  fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR);
-                  set_atr3(fun_idx,class_idx);
+                  fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,current_class_idx);
               }
             }
         }
@@ -255,9 +281,15 @@ parameter
 
   | _TYPE _ID
       {
-        insert_symbol($2, PAR, $1, 1, NO_ATR);
+        if(isClass==0){
+        insert_symbol($2, PAR, $1, 1, NO_ATR,NO_ATR);
         set_atr1(fun_idx, 1);
         set_atr2(fun_idx, $1);
+        }else{
+        insert_symbol($2, PAR, $1, 1, NO_ATR,current_class_idx);
+        set_atr1(fun_idx, 1);
+        set_atr2(fun_idx, $1);
+        }
         
       }
   ;
@@ -283,24 +315,31 @@ variable
   : _TYPE _ID _SEMICOLON
       {
         if (isClass==0){
-        if(lookup_symbol($2, VAR|PAR) == NO_INDEX)
-           insert_symbol($2, VAR, $1, ++var_num, NO_ATR);
-        else 
-           err("redefinition of '%s'", $2);
+          int var_indx = lookup_symbol($2, VAR|PAR);
+          if(var_indx == NO_INDEX)
+            insert_symbol($2, VAR, $1, ++var_num, NO_ATR,NO_ATR);
+          else{
+            if(get_atr3(var_indx) == NO_ATR){
+              err("redefinition of '%s'", $2);
+            }else{
+              insert_symbol($2, VAR, $1, ++var_num, NO_ATR,NO_ATR);
+            }
+          }
         }else{
-        if(lookup_symbol($2, VAR|PAR|ATR) == NO_INDEX)
-           insert_symbol($2, VAR, $1, ++var_num, NO_ATR);
-        else {
-          if(lookup_symbol($2,ATR) == NO_INDEX){
-            err("redefinition of '%s'", $2);
-          }else{
-           if(get_atr3(lookup_symbol($2,ATR)) == class_idx){
-            err("redefinition of '%s' attribute", $2);
-           }else{
-            insert_symbol($2, VAR, $1, ++var_num, NO_ATR);
-           }
-           }
-        }
+          if(lookup_symbol($2, VAR|PAR|ATR) == NO_INDEX)
+            insert_symbol($2, VAR, $1, ++var_num, NO_ATR,current_class_idx);
+          else {
+            int var_indx =lookup_symbol($2,ATR);
+            if(var_indx == NO_INDEX){
+              err("redefinition of '%s'", $2);
+            }else{
+              if(get_atr3(var_indx) == current_class_idx){
+                err("redefinition of '%s' attribute", $2);
+              }else{
+                insert_symbol($2, VAR, $1, ++var_num, NO_ATR,current_class_idx);
+              }
+            }
+          }
         }
       }
   ;
@@ -320,29 +359,33 @@ statement
 
 class_declaration
   : _CLASS _ID {
-      if(lookup_symbol($2, CLASS) == NO_INDEX)
+      isClass=1;
+      if(lookup_symbol($2, CLAS) == NO_INDEX)
         err("'%s' is not a class", $2);
     }
   _ID {
-    int idx=lookup_symbol($4,VAR|PAR|INSTANCE);
-    int class_idx = lookup_symbol($2, CLASS);
+    int idx=lookup_symbol($4,VAR|PAR|INST);
     if(idx == NO_INDEX){
-      class_instanceIDX = insert_symbol($4, INSTANCE, NO_TYPE, class_idx, NO_ATR);
-      class_instanceIDX=class_idx;
+      instance_index = lookup_symbol($2,CLAS);
+      current_instance_idx = insert_symbol($4, INST, NO_TYPE, NO_ATR, NO_ATR,instance_index);
     }else{
       err("redefinition of '%s' ",$4);
     }
   }
   _ASSIGN _NEW _ID {
-      if(lookup_symbol($8, CLASS) == NO_INDEX)
+      if(lookup_symbol($8, CLAS) == NO_INDEX)
         err("'%s' is not a class", $8);
+      if(lookup_symbol($2,CLAS) != lookup_symbol($8,CLAS)){
+        err("invalid instance of class creation");
+      }
     }
-    _LPAREN class_argument_list 
+    _LPAREN {instance_declaration_arg_counter = 0;} class_argument_list 
         {
-      int class_idx = lookup_symbol($2, CLASS);
-      if(get_atr1(class_idx) != arg_counter)
+      int class_idx = lookup_symbol($2, CLAS);
+      if(get_atr1(class_idx) != instance_declaration_arg_counter)
         err("wrong number of args to class '%s'", get_name(class_idx));
-      arg_counter = 0;
+      instance_declaration_arg_counter = 0;
+      isClass=0;
   }
 
     _RPAREN _SEMICOLON
@@ -362,9 +405,9 @@ class_arguments
 class_argument
   : num_exp
   {
-    if(parameter_map[class_instanceIDX][arg_counter] != get_type($1))
-      err("incompatible type for argument in '%s'",get_name(class_instanceIDX));
-    arg_counter += 1;
+    if(parameter_map[get_atr3(current_instance_idx)][instance_declaration_arg_counter] != get_type($1))
+      err("incompatible type for argument in '%s'",get_name(get_atr3(current_instance_idx)));
+    instance_declaration_arg_counter += 1;
   }
   ;
 
@@ -383,6 +426,26 @@ assignment_statement
             if(get_type(idx) != get_type($3))
               err("incompatible types in assignment");
           gen_mov($3, idx);
+        }else{
+          int id_indx = lookup_symbol($1,VAR|PAR|ATR);
+          if(id_indx == NO_INDEX){
+            err("invalid lvalue '%s' in assignment", $1);
+          }else{
+            int is_atr = lookup_symbol($1,ATR);
+            if(is_atr != NO_INDEX){
+              if(get_atr3(is_atr) != current_class_idx)
+                err("attribute not part of this class '%s' class '%s' ",$1,get_name(current_class_idx));
+              else{
+                  if(get_type(id_indx) != get_type($3))
+                    err("incompatible types in assignment");
+                  gen_mov($3, id_indx);
+              }
+            }else{
+                if(get_type(id_indx) != get_type($3))
+                  err("incompatible types in assignment");
+                gen_mov($3, id_indx);
+            }
+          }
         }
       }
   ;
@@ -413,12 +476,14 @@ exp
   | _ID _DOT function_call
     {
       isClass=1;
-
-      if(lookup_symbol($1,INSTANCE)==NO_INDEX){
+      int instance_indx = lookup_symbol($1,INST);
+      current_class_idx= get_atr3(instance_indx);
+      if(instance_indx==NO_INDEX){
         err("'%s' is not declared as class",$1);
-      };
-      isClass=0;
+      };      
       $$ = $3;
+      isClass=0;
+      print_symtab();
     }
   | _ID
       {
@@ -426,6 +491,16 @@ exp
           $$ = lookup_symbol($1, VAR|PAR);
           if($$ == NO_INDEX)
             err("'%s' undeclared", $1);
+        }else{
+          int indx = lookup_symbol($1,VAR|PAR|ATR);
+          $$ = indx;
+          if($$ == NO_INDEX)
+            err("'%s' undeclared", $1);
+          if(lookup_symbol($1,VAR|PAR)==NO_INDEX){
+            if(get_atr3(indx) != current_class_idx){
+              err("'%s' undeclared, atr3 '%d' class idx '%d'", $1, get_atr3(indx),current_class_idx);
+            }
+          }
         }
       }
   | function_call
@@ -459,7 +534,7 @@ function_call
           fcall_idx = lookup_symbol($1, FUN);
           if(fcall_idx == NO_INDEX)
             err("'%s' is not a function", $1);
-          if(get_atr3(fcall_idx) != class_instanceIDX){
+          if(get_atr3(fcall_idx) != current_class_idx){
             err("'%s' is not a function of class", $1);
           }
         }
@@ -485,7 +560,14 @@ argument
   | num_exp
     { 
       if(isClass==0){
-        if(get_atr2(fcall_idx) != get_type($1))
+        if(get_type(fcall_idx) != get_type($1))
+          err("incompatible type for argument");
+        free_if_reg($1);
+        code("\n\t\t\tPUSH\t");
+        gen_sym_name($1);
+        $$ = 1;
+      }else{
+        if(get_type(fcall_idx) != get_type($1))
           err("incompatible type for argument");
         free_if_reg($1);
         code("\n\t\t\tPUSH\t");
@@ -535,8 +617,9 @@ rel_exp
 return_statement
   : _RETURN num_exp _SEMICOLON
       {
-        if(get_type(fun_idx) != get_type($2))
+        if(get_type(fun_idx) != get_type($2)){
           err("incompatible types in return");
+          }
         gen_mov($2, FUN_REG);
         code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));        
       }
