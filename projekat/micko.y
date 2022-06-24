@@ -239,7 +239,6 @@ function
       }
     _LPAREN parameter _RPAREN body
       {
-        printf("\n\function");
         clear_symbols(fun_idx + 1);
         var_num = 0;
         
@@ -536,12 +535,10 @@ rel_exp
 return_statement
   : _RETURN num_exp _SEMICOLON
       {
-        if(isClass==0){
         if(get_type(fun_idx) != get_type($2))
           err("incompatible types in return");
         gen_mov($2, FUN_REG);
-        code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));   
-        }     
+        code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));        
       }
   ;
 
