@@ -9,6 +9,7 @@ typedef struct sym_entry {
    unsigned type;          // tip vrednosti simbola
    unsigned atr1;          // dodatni attribut simbola
    unsigned atr2;          // dodatni attribut simbola
+   unsigned atr3;          // dodatni attribut simbola
 } SYMBOL_ENTRY;
 
 // Vraca indeks prvog sledeceg praznog elementa.
@@ -40,6 +41,8 @@ void     set_atr1(int index, unsigned atr1);
 unsigned get_atr1(int index);
 void     set_atr2(int index, unsigned atr2);
 unsigned get_atr2(int index);
+void     set_atr3(int index, unsigned atr3);
+unsigned get_atr3(int index);
 
 // Brise elemente tabele od zadatog indeksa
 void clear_symbols(unsigned begin_index);

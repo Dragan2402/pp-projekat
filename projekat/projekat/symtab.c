@@ -125,6 +125,17 @@ unsigned get_atr2(int index) {
   return NO_ATR;
 }
 
+void set_atr3(int index, unsigned atr3) {
+  if(index > -1 && index < SYMBOL_TABLE_LENGTH)
+    symbol_table[index].atr3 = atr3;
+}
+
+unsigned get_atr3(int index) {
+  if(index > -1 && index < SYMBOL_TABLE_LENGTH)
+    return symbol_table[index].atr3;
+  return NO_ATR;
+}
+
 // Brise elemente tabele od zadatog indeksa do kraja tabele
 void clear_symbols(unsigned begin_index) {
   int i;
@@ -155,7 +166,7 @@ void clear_symtab(void) {
 // Ispisuje sve elemente tabele simbola.
 void print_symtab(void) {
   static const char *symbol_kinds[] = { 
-    "NONE", "REG", "LIT", "FUN", "VAR", "PAR" };
+    "NONE", "REG", "LIT", "FUN", "VAR", "PAR","CLASS", "ATR"  , "INSTANCE" };
   int i,j;
   printf("\n\nSYMBOL TABLE\n");
   printf("\n       name           kind   type  atr1   atr2");
