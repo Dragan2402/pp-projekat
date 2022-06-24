@@ -9,11 +9,18 @@ class Dragan {
     }
 }
 
+int pet(int test){
+    int y;
+    y= test;
+    return y;
+}
+
 int main() {
     int randomVariable;
     int test;
     randomVariable = 5;
     class Dragan draganInstance = new Dragan(randomVariable);
     test = draganInstance.funkcija1Test();
-    return test;
+    return pet(randomVariable);
 }
+

@@ -402,6 +402,8 @@ class_declaration
         err("wrong number of args to class '%s'", get_name(class_idx));
       instance_declaration_arg_counter = 0;
       isClass=0;
+      code("\n\t\tADDS\t%%15,$%d,%%15",get_atr1(class_idx) * 4);
+      code("\n\t\tCALL\t%s", get_name(class_idx));
   }
 
     _RPAREN _SEMICOLON
@@ -424,6 +426,9 @@ class_argument
     if(parameter_map[get_atr3(current_instance_idx)][instance_declaration_arg_counter] != get_type($1))
       err("incompatible type for argument in '%s'",get_name(get_atr3(current_instance_idx)));
     instance_declaration_arg_counter += 1;
+    free_if_reg($1);
+    code("\n\t\tPUSH\t");
+    gen_sym_name($1);
   }
   ;
 
@@ -561,7 +566,7 @@ function_call
             err("wrong number of arguments");
           code("\n\t\tCALL\t%s", get_name(fcall_idx));
           if($4 > 0)
-            code("\n\t\t\tADDS\t%%15,$%d,%%15", $4 * 4);
+            code("\n\t\tADDS\t%%15,$%d,%%15", $4 * 4);
           set_type(FUN_REG, get_type(fcall_idx));
           $$ = FUN_REG;
           
@@ -578,14 +583,14 @@ argument
         if(get_type(fcall_idx) != get_type($1))
           err("incompatible type for argument");
         free_if_reg($1);
-        code("\n\t\t\tPUSH\t");
+        code("\n\t\tPUSH\t");
         gen_sym_name($1);
         $$ = 1;
       }else{
         if(get_type(fcall_idx) != get_type($1))
           err("incompatible type for argument");
         free_if_reg($1);
-        code("\n\t\t\tPUSH\t");
+        code("\n\t\tPUSH\t");
         gen_sym_name($1);
         $$ = 1;
       }
