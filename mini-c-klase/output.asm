@@ -4,7 +4,7 @@ p:
 Dragan:
 		PUSH	%14
 		MOV 	%15,%14
-		MOV 	4(%14),p
+		MOV 	8(%14),p
 		JMP 	@Dragan_exit
 @Dragan_exit:
 		MOV 	%14,%15

@@ -29,6 +29,7 @@
 
   int* parameter_map[128];
   int arg_counter = 0;
+  int arg_position = 1;
   int isClass = 0;
   int attributes_counter=0;
   FILE *output;
@@ -104,7 +105,7 @@ class
         err("Invalid number of arguments in constructor, arguments '%d', attributes '%d'",arg_counter,attributes_counter);
        }
        
-     } functions_list _RBRACKET {
+     } functions_list _RBRACKET {print_symtab();
       arg_counter=0;
       attributes_counter=0;
     } ;
@@ -200,7 +201,8 @@ constructor_parameter
             if(param_types[arg_counter] != $1){
               err("inavlid constructor parameter, paramtere type '%d', attribute type '%d'", $1, param_types[arg_counter]);
             }
-            insert_symbol($2, PAR, $1, arg_counter , NO_ATR,current_class_idx);
+            insert_symbol($2, PAR, $1, arg_position , NO_ATR,current_class_idx);
+            ++arg_position;
             ++arg_counter;
 
           }
@@ -209,7 +211,8 @@ constructor_parameter
           if(param_types[arg_counter] != $1){
             err("inavlid constructor parameter, paramtere type '%d', attribute type '%d'",$1,param_types[arg_counter]);
           }
-          insert_symbol($2, PAR, $1, arg_counter, NO_ATR,current_class_idx);
+          insert_symbol($2, PAR, $1, arg_position, NO_ATR,current_class_idx);
+          ++arg_position;
           ++arg_counter;
 
         }
