@@ -19,7 +19,6 @@
   int var_num = 0;
 
   int fun_idx = -1;
-  int class_idx = -1;
   int current_class_idx = -1;
   int current_instance_idx= -1;
   int instance_declaration_arg_counter = 0;
@@ -101,7 +100,7 @@ class
         attributes_counter=0;
   }
     _LBRACKET attributes_list constructor { 
-       if( arg_counter != get_atr1(class_idx)){
+       if( arg_counter != get_atr1(current_class_idx)){
         err("Invalid number of arguments in constructor, arguments '%d', attributes '%d'",arg_counter,attributes_counter);
        }
        
@@ -121,6 +120,7 @@ attribute
         int atr_idx = lookup_symbol($2, ATR);
         if(atr_idx == NO_INDEX){
           int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
+          code("\n%s:\n\t\tWORD\t1", $2);
           attributes_counter = get_atr1(current_class_idx);
           int* param_types = parameter_map[current_class_idx];
           param_types[attributes_counter] = $1;
@@ -132,6 +132,7 @@ attribute
            err("redefinition of '%s'", $2);
           }else{
             int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
+            code("\n%s:\n\t\tWORD\t1", $2);
             attributes_counter = get_atr1(current_class_idx);
             int* param_types = parameter_map[current_class_idx];
             param_types[attributes_counter] = $1;
@@ -160,9 +161,17 @@ constructor
       err("Inavlid constructor name '%s', class name '%s'",$1,get_name(current_class_idx));
     }
     arg_counter = 0 ;
+    code("\n%s:", $1);
+    code("\n\t\tPUSH\t%%14");
+    code("\n\t\tMOV \t%%15,%%14");
+    
   } _LPAREN  constructor_parameters _RPAREN _LBRACKET attribute_assign_list {  
+    code("\n\t\tJMP \t@%s_exit", $1);  
+    code("\n@%s_exit:", $1);
+    code("\n\t\tMOV \t%%14,%%15");
+    code("\n\t\tPOP \t%%14");
+    code("\n\t\tRET");
     clear_symbols(get_last_element() - arg_counter +1);
-    arg_counter = 0 ;
   } _RBRACKET;
 
 constructor_parameters
@@ -181,6 +190,7 @@ constructor_parameter
       if(lookup_symbol($2, PAR) != -1){
         err("Redefinition of parameter %s ", $2);
       }else{
+        printf("OVDJE");
         int indx_atr=lookup_symbol($2,ATR);
         if(indx_atr != NO_INDEX){
           if(get_atr3(indx_atr) == current_class_idx){
@@ -192,6 +202,7 @@ constructor_parameter
             }
             insert_symbol($2, PAR, $1, arg_counter , NO_ATR,current_class_idx);
             ++arg_counter;
+
           }
         }else{
           int* param_types = parameter_map[current_class_idx];
@@ -200,6 +211,7 @@ constructor_parameter
           }
           insert_symbol($2, PAR, $1, arg_counter, NO_ATR,current_class_idx);
           ++arg_counter;
+
         }
       }
     }
@@ -223,6 +235,7 @@ attribute_assign
             err("incompatible types in assignment of attribute");
           if(get_atr3(idx_par)!=current_class_idx)
             err("parametar '%s' not from this class",$3);
+          gen_mov(idx_par, idx);
         }else{
           err("unknown attribute '%s' in class", $1);
         }
@@ -261,6 +274,9 @@ function
                   fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,current_class_idx);
               }
             }
+            code("\n%s:", $2);
+            code("\n\t\tPUSH\t%%14");
+            code("\n\t\tMOV \t%%15,%%14");
         }
       }
     _LPAREN parameter _RPAREN body
@@ -483,7 +499,6 @@ exp
       };      
       $$ = $3;
       isClass=0;
-      print_symtab();
     }
   | _ID
       {
@@ -544,7 +559,7 @@ function_call
 
           if(get_atr1(fcall_idx) != $4)
             err("wrong number of arguments");
-          code("\n\t\t\tCALL\t%s", get_name(fcall_idx));
+          code("\n\t\tCALL\t%s", get_name(fcall_idx));
           if($4 > 0)
             code("\n\t\t\tADDS\t%%15,$%d,%%15", $4 * 4);
           set_type(FUN_REG, get_type(fcall_idx));
