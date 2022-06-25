@@ -646,6 +646,7 @@ rel_exp
 return_statement
   : _RETURN num_exp _SEMICOLON
       {
+        print_symtab();
         if(get_type(fun_idx) != get_type($2)){
           err("incompatible types in return");
           }
