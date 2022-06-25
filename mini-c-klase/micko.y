@@ -106,7 +106,7 @@ class
         err("Invalid number of arguments in constructor, arguments '%d', attributes '%d'",arg_counter,attributes_counter);
        }
        
-     } functions_list _RBRACKET {print_symtab();
+     } functions_list _RBRACKET {
       arg_counter=0;
       attributes_counter=0;
     } ;
@@ -192,7 +192,6 @@ constructor_parameter
       if(lookup_symbol($2, PAR) != -1){
         err("Redefinition of parameter %s ", $2);
       }else{
-        printf("OVDJE");
         int indx_atr=lookup_symbol($2,ATR);
         if(indx_atr != NO_INDEX){
           if(get_atr3(indx_atr) == current_class_idx){

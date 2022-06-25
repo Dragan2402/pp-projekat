@@ -34,38 +34,6 @@ getB:
 		MOV 	%14,%15
 		POP 	%14
 		RET
-r:
-		WORD	1
-Circle:
-		PUSH	%14
-		MOV 	%15,%14
-		MOV 	16(%14),r
-		JMP 	@Circle_exit
-@Circle_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
-getR:
-		PUSH	%14
-		MOV 	%15,%14
-@getR_body:
-		MOV 	r,%13
-		JMP 	@getR_exit
-@getR_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
-getRFull:
-		PUSH	%14
-		MOV 	%15,%14
-@getRFull_body:
-		ADDS	r,r,%0
-		MOV 	%0,%13
-		JMP 	@getRFull_exit
-@getRFull_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
 main:
 		PUSH	%14
 		MOV 	%15,%14
@@ -84,11 +52,7 @@ main:
 		MOV 	%13,-12(%14)
 		CALL	getB
 		MOV 	%13,-16(%14)
-		PUSH	-4(%14)
-		CALL	Circle
-		ADDS	%15,$4,%15
-		CALL	getRFull
-		MOV 	%13,%13
+		MOV 	-16(%14),%13
 		JMP 	@main_exit
 @main_exit:
 		MOV 	%14,%15

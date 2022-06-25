@@ -1,4 +1,4 @@
-//OPIS: Deklarisanje klase i kreiranje instance klase i testiranje gettera
+//OPIS: Deklarisanje dvije klase
 //RETURN: 10
 class Rectangle{  
     int a;
@@ -15,13 +15,25 @@ class Rectangle{
     }
 }
 
+class Circle{  
+    int r;
+    Circle(int parR){
+        r = parR;        
+    }
+    int getR(){
+        return r;
+    }
+    int getRFull(){
+    	return r+r;
+    }
+}
+
 
 int main() {
     int aX;
     int bX;	
     int test1;
     int test2;
-
     int test3;
     aX = 5;
     bX = 6;
@@ -30,5 +42,6 @@ int main() {
     class Rectangle rectangleInstance = new Rectangle(aX,bX);
     test1 = rectangleInstance.getA(test3);
     test2 = rectangleInstance.getB();
-    return test1;
+    class Circle circleInstance = new Circle(aX);
+    return circleInstance.getRFull();
 }
