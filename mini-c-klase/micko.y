@@ -134,7 +134,7 @@ attribute
            err("redefinition of '%s'", $2);
           }else{
             int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
-            code("\n%s:\n\t\tWORD\t1",get_name(current_class_idx), $2);
+            code("\n%s:\n\t\tWORD\t1", $2);
             attributes_counter = get_atr1(current_class_idx);
             int* param_types = parameter_map[current_class_idx];
             param_types[attributes_counter] = $1;

@@ -1577,7 +1577,7 @@ yyreduce:
            err("redefinition of '%s'", (yyvsp[(2) - (2)].s));
           }else{
             int idx=insert_symbol((yyvsp[(2) - (2)].s), ATR, (yyvsp[(1) - (2)].i), attributes_counter, NO_ATR,current_class_idx);
-            code("\n%s:\n\t\tWORD\t1",get_name(current_class_idx), (yyvsp[(2) - (2)].s));
+            code("\n%s:\n\t\tWORD\t1", (yyvsp[(2) - (2)].s));
             attributes_counter = get_atr1(current_class_idx);
             int* param_types = parameter_map[current_class_idx];
             param_types[attributes_counter] = (yyvsp[(1) - (2)].i);
