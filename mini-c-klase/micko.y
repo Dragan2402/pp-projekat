@@ -27,6 +27,7 @@
   int instance_index=-1;
   int lab_num = -1;
 
+  int arguments_array[128];
   int* parameter_map[128];
   int arg_counter = 0;
   int arg_position = 1;
@@ -121,7 +122,7 @@ attribute
         int atr_idx = lookup_symbol($2, ATR);
         if(atr_idx == NO_INDEX){
           int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
-          code("\n%s:\n\t\tWORD\t1", $2);
+          code("\n%s:\n\t\tWORD\t1",$2);
           attributes_counter = get_atr1(current_class_idx);
           int* param_types = parameter_map[current_class_idx];
           param_types[attributes_counter] = $1;
@@ -133,7 +134,7 @@ attribute
            err("redefinition of '%s'", $2);
           }else{
             int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
-            code("\n%s:\n\t\tWORD\t1", $2);
+            code("\n%s:\n\t\tWORD\t1",get_name(current_class_idx), $2);
             attributes_counter = get_atr1(current_class_idx);
             int* param_types = parameter_map[current_class_idx];
             param_types[attributes_counter] = $1;
@@ -238,7 +239,6 @@ attribute_assign
             err("incompatible types in assignment of attribute");
           if(get_atr3(idx_par)!=current_class_idx)
             err("parametar '%s' not from this class",$3);
-          print_symtab();
           gen_mov(idx_par, idx);
         }else{
           err("unknown attribute '%s' in class", $1);
@@ -404,6 +404,12 @@ class_declaration
       int class_idx = lookup_symbol($2, CLAS);
       if(get_atr1(class_idx) != instance_declaration_arg_counter)
         err("wrong number of args to class '%s'", get_name(class_idx));
+      for(int i=instance_declaration_arg_counter-1; i >= 0 ; i--){
+            int indx = arguments_array[i];
+            free_if_reg(indx);
+            code("\n\t\tPUSH\t");
+            gen_sym_name(indx);
+      }
       instance_declaration_arg_counter = 0;
       isClass=0;
       code("\n\t\tCALL\t%s", get_name(class_idx));
@@ -430,10 +436,9 @@ class_argument
   {
     if(parameter_map[get_atr3(current_instance_idx)][instance_declaration_arg_counter] != get_type($1))
       err("incompatible type for argument in '%s'",get_name(get_atr3(current_instance_idx)));
+
+    arguments_array[instance_declaration_arg_counter]=$1;
     instance_declaration_arg_counter += 1;
-    free_if_reg($1);
-    code("\n\t\tPUSH\t");
-    gen_sym_name($1);
   }
   ;
 

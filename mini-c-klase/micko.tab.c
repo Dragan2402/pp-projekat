@@ -98,6 +98,7 @@
   int instance_index=-1;
   int lab_num = -1;
 
+  int arguments_array[128];
   int* parameter_map[128];
   int arg_counter = 0;
   int arg_position = 1;
@@ -107,7 +108,7 @@
 
 
 /* Line 189 of yacc.c  */
-#line 111 "micko.tab.c"
+#line 112 "micko.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -164,7 +165,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 38 "micko.y"
+#line 39 "micko.y"
 
   int i;
   char *s;
@@ -172,7 +173,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 176 "micko.tab.c"
+#line 177 "micko.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -184,7 +185,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 188 "micko.tab.c"
+#line 189 "micko.tab.c"
 
 #ifdef short
 # undef short
@@ -496,14 +497,14 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    74,    74,    74,    74,    81,    83,    87,    88,    92,
-     103,    92,   113,   115,   119,   119,   147,   149,   152,   153,
-     157,   169,   157,   178,   180,   184,   185,   189,   224,   226,
-     229,   253,   252,   300,   302,   319,   318,   329,   331,   335,
+       0,    75,    75,    75,    75,    82,    84,    88,    89,    93,
+     104,    93,   114,   116,   120,   120,   148,   150,   153,   154,
+     158,   170,   158,   179,   181,   185,   186,   190,   225,   227,
+     230,   253,   252,   300,   302,   319,   318,   329,   331,   335,
      367,   369,   373,   374,   375,   376,   377,   381,   386,   395,
-     402,   403,   381,   418,   420,   424,   425,   429,   441,   445,
-     480,   482,   501,   502,   513,   531,   537,   542,   545,   551,
-     550,   583,   585,   606,   609,   615,   620,   614,   633,   643
+     402,   403,   381,   424,   426,   430,   431,   435,   446,   450,
+     485,   487,   506,   507,   518,   536,   542,   547,   550,   556,
+     555,   588,   590,   611,   614,   620,   625,   619,   638,   648
 };
 #endif
 
@@ -1495,21 +1496,21 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 74 "micko.y"
+#line 75 "micko.y"
     { isClass=1; ;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 74 "micko.y"
+#line 75 "micko.y"
     { isClass=0; ;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 75 "micko.y"
+#line 76 "micko.y"
     {  
         if(lookup_symbol("main", FUN) == NO_INDEX)
           err("undefined reference to 'main'");
@@ -1519,7 +1520,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 92 "micko.y"
+#line 93 "micko.y"
     {
         current_class_idx = lookup_symbol((yyvsp[(2) - (2)].s), CLAS);
         if(current_class_idx == NO_INDEX){
@@ -1536,7 +1537,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 103 "micko.y"
+#line 104 "micko.y"
     { 
        if( arg_counter != get_atr1(current_class_idx)){
         err("Invalid number of arguments in constructor, arguments '%d', attributes '%d'",arg_counter,attributes_counter);
@@ -1548,7 +1549,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 108 "micko.y"
+#line 109 "micko.y"
     {print_symtab();
       arg_counter=0;
       attributes_counter=0;
@@ -1558,13 +1559,13 @@ yyreduce:
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 119 "micko.y"
+#line 120 "micko.y"
     {
       {
         int atr_idx = lookup_symbol((yyvsp[(2) - (2)].s), ATR);
         if(atr_idx == NO_INDEX){
           int idx=insert_symbol((yyvsp[(2) - (2)].s), ATR, (yyvsp[(1) - (2)].i), attributes_counter, NO_ATR,current_class_idx);
-          code("\n%s:\n\t\tWORD\t1", (yyvsp[(2) - (2)].s));
+          code("\n%s:\n\t\tWORD\t1",(yyvsp[(2) - (2)].s));
           attributes_counter = get_atr1(current_class_idx);
           int* param_types = parameter_map[current_class_idx];
           param_types[attributes_counter] = (yyvsp[(1) - (2)].i);
@@ -1576,7 +1577,7 @@ yyreduce:
            err("redefinition of '%s'", (yyvsp[(2) - (2)].s));
           }else{
             int idx=insert_symbol((yyvsp[(2) - (2)].s), ATR, (yyvsp[(1) - (2)].i), attributes_counter, NO_ATR,current_class_idx);
-            code("\n%s:\n\t\tWORD\t1", (yyvsp[(2) - (2)].s));
+            code("\n%s:\n\t\tWORD\t1",get_name(current_class_idx), (yyvsp[(2) - (2)].s));
             attributes_counter = get_atr1(current_class_idx);
             int* param_types = parameter_map[current_class_idx];
             param_types[attributes_counter] = (yyvsp[(1) - (2)].i);
@@ -1591,7 +1592,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 157 "micko.y"
+#line 158 "micko.y"
     {
     char* class_name = get_name(current_class_idx);
     char* id = (yyvsp[(1) - (1)].s);
@@ -1610,7 +1611,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 169 "micko.y"
+#line 170 "micko.y"
     {  
     code("\n\t\tJMP \t@%s_exit", (yyvsp[(1) - (7)].s));  
     code("\n@%s_exit:", (yyvsp[(1) - (7)].s));
@@ -1624,7 +1625,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 190 "micko.y"
+#line 191 "micko.y"
     {
       if(lookup_symbol((yyvsp[(2) - (2)].s), PAR) != -1){
         err("Redefinition of parameter %s ", (yyvsp[(2) - (2)].s));
@@ -1661,7 +1662,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 230 "micko.y"
+#line 231 "micko.y"
     {
       int idx = lookup_symbol((yyvsp[(1) - (4)].s), ATR);
       if(idx == NO_INDEX)
@@ -1673,7 +1674,6 @@ yyreduce:
             err("incompatible types in assignment of attribute");
           if(get_atr3(idx_par)!=current_class_idx)
             err("parametar '%s' not from this class",(yyvsp[(3) - (4)].s));
-          print_symtab();
           gen_mov(idx_par, idx);
         }else{
           err("unknown attribute '%s' in class", (yyvsp[(1) - (4)].s));
@@ -1861,6 +1861,12 @@ yyreduce:
       int class_idx = lookup_symbol((yyvsp[(2) - (12)].s), CLAS);
       if(get_atr1(class_idx) != instance_declaration_arg_counter)
         err("wrong number of args to class '%s'", get_name(class_idx));
+      for(int i=instance_declaration_arg_counter-1; i >= 0 ; i--){
+            int indx = arguments_array[i];
+            free_if_reg(indx);
+            code("\n\t\tPUSH\t");
+            gen_sym_name(indx);
+      }
       instance_declaration_arg_counter = 0;
       isClass=0;
       code("\n\t\tCALL\t%s", get_name(class_idx));
@@ -1872,21 +1878,20 @@ yyreduce:
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 430 "micko.y"
+#line 436 "micko.y"
     {
     if(parameter_map[get_atr3(current_instance_idx)][instance_declaration_arg_counter] != get_type((yyvsp[(1) - (1)].i)))
       err("incompatible type for argument in '%s'",get_name(get_atr3(current_instance_idx)));
+
+    arguments_array[instance_declaration_arg_counter]=(yyvsp[(1) - (1)].i);
     instance_declaration_arg_counter += 1;
-    free_if_reg((yyvsp[(1) - (1)].i));
-    code("\n\t\tPUSH\t");
-    gen_sym_name((yyvsp[(1) - (1)].i));
   ;}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 446 "micko.y"
+#line 451 "micko.y"
     {
         if(isClass==0){
           int idx = lookup_symbol((yyvsp[(1) - (4)].s), VAR|PAR);
@@ -1923,7 +1928,7 @@ yyreduce:
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 483 "micko.y"
+#line 488 "micko.y"
     {
         if(get_type((yyvsp[(1) - (3)].i)) != get_type((yyvsp[(3) - (3)].i)))
           err("invalid operands: arithmetic operation");
@@ -1944,7 +1949,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 503 "micko.y"
+#line 508 "micko.y"
     {
       isClass=1;
       int instance_indx = lookup_symbol((yyvsp[(1) - (3)].s),INST);
@@ -1960,7 +1965,7 @@ yyreduce:
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 514 "micko.y"
+#line 519 "micko.y"
     {
         if( isClass==0){
           (yyval.i) = lookup_symbol((yyvsp[(1) - (1)].s), VAR|PAR);
@@ -1983,7 +1988,7 @@ yyreduce:
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 532 "micko.y"
+#line 537 "micko.y"
     {
         (yyval.i) = take_reg();
         gen_mov(FUN_REG, (yyval.i));
@@ -1993,28 +1998,28 @@ yyreduce:
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 538 "micko.y"
+#line 543 "micko.y"
     { (yyval.i) = (yyvsp[(2) - (3)].i); ;}
     break;
 
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 543 "micko.y"
+#line 548 "micko.y"
     { (yyval.i) = insert_literal((yyvsp[(1) - (1)].s), INT); ;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 546 "micko.y"
+#line 551 "micko.y"
     { (yyval.i) = insert_literal((yyvsp[(1) - (1)].s), UINT); ;}
     break;
 
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 551 "micko.y"
+#line 556 "micko.y"
     {
         if(isClass==0){
         fcall_idx = lookup_symbol((yyvsp[(1) - (1)].s), FUN);
@@ -2036,7 +2041,7 @@ yyreduce:
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 568 "micko.y"
+#line 573 "micko.y"
     {
 
           if(get_atr1(fcall_idx) != (yyvsp[(4) - (5)].i))
@@ -2053,14 +2058,14 @@ yyreduce:
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 583 "micko.y"
+#line 588 "micko.y"
     { (yyval.i) = 0; ;}
     break;
 
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 586 "micko.y"
+#line 591 "micko.y"
     { 
       if(isClass==0){
         if(get_type(fcall_idx) != get_type((yyvsp[(1) - (1)].i)))
@@ -2083,21 +2088,21 @@ yyreduce:
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 607 "micko.y"
+#line 612 "micko.y"
     { code("\n@exit%d:", (yyvsp[(1) - (1)].i)); ;}
     break;
 
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 610 "micko.y"
+#line 615 "micko.y"
     { code("\n@exit%d:", (yyvsp[(1) - (3)].i)); ;}
     break;
 
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 615 "micko.y"
+#line 620 "micko.y"
     {
         (yyval.i) = ++lab_num;
         code("\n@if%d:", lab_num);
@@ -2107,7 +2112,7 @@ yyreduce:
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 620 "micko.y"
+#line 625 "micko.y"
     {
         code("\n\t\t%s\t@false%d", opp_jumps[(yyvsp[(4) - (4)].i)], (yyvsp[(3) - (4)].i));
         code("\n@true%d:", (yyvsp[(3) - (4)].i));
@@ -2117,7 +2122,7 @@ yyreduce:
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 625 "micko.y"
+#line 630 "micko.y"
     {
         code("\n\t\tJMP \t@exit%d", (yyvsp[(3) - (7)].i));
         code("\n@false%d:", (yyvsp[(3) - (7)].i));
@@ -2128,7 +2133,7 @@ yyreduce:
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 634 "micko.y"
+#line 639 "micko.y"
     {
         if(get_type((yyvsp[(1) - (3)].i)) != get_type((yyvsp[(3) - (3)].i)))
           err("invalid operands: relational operator");
@@ -2140,7 +2145,7 @@ yyreduce:
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 644 "micko.y"
+#line 649 "micko.y"
     {
         if(get_type(fun_idx) != get_type((yyvsp[(2) - (3)].i))){
           err("incompatible types in return");
@@ -2153,7 +2158,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2157 "micko.tab.c"
+#line 2162 "micko.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2365,7 +2370,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 653 "micko.y"
+#line 658 "micko.y"
 
 
 int yyerror(char *s) {
