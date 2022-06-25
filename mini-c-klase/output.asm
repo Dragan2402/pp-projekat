@@ -23,10 +23,8 @@ funkcija1Test:
 pet:
 		PUSH	%14
 		MOV 	%15,%14
-		SUBS	%15,$4,%15
 @pet_body:
-		MOV 	8(%14),-4(%14)
-		MOV 	-4(%14),%13
+		MOV 	8(%14),%13
 		JMP 	@pet_exit
 @pet_exit:
 		MOV 	%14,%15
@@ -39,9 +37,11 @@ main:
 @main_body:
 		MOV 	$5,-4(%14)
 		PUSH	-4(%14)
-		ADDS	%15,$4,%15
 		CALL	Dragan
+		ADDS	%15,$4,%15
+		PUSH	-4(%14)
 		CALL	funkcija1Test
+		ADDS	%15,$4,%15
 		MOV 	%13,-8(%14)
 		PUSH	-4(%14)
 		CALL	pet

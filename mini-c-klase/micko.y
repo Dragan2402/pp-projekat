@@ -172,7 +172,7 @@ constructor
     code("\n\t\tMOV \t%%14,%%15");
     code("\n\t\tPOP \t%%14");
     code("\n\t\tRET");
-    clear_symbols(get_last_element() - arg_counter +1);
+    //clear_symbols(get_last_element() - arg_counter +1);
   } _RBRACKET;
 
 constructor_parameters
@@ -238,6 +238,7 @@ attribute_assign
             err("incompatible types in assignment of attribute");
           if(get_atr3(idx_par)!=current_class_idx)
             err("parametar '%s' not from this class",$3);
+          print_symtab();
           gen_mov(idx_par, idx);
         }else{
           err("unknown attribute '%s' in class", $1);
@@ -405,8 +406,9 @@ class_declaration
         err("wrong number of args to class '%s'", get_name(class_idx));
       instance_declaration_arg_counter = 0;
       isClass=0;
-      code("\n\t\tADDS\t%%15,$%d,%%15",get_atr1(class_idx) * 4);
       code("\n\t\tCALL\t%s", get_name(class_idx));
+      code("\n\t\tADDS\t%%15,$%d,%%15",get_atr1(class_idx) * 4);
+
   }
 
     _RPAREN _SEMICOLON

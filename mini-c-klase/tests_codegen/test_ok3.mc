@@ -4,15 +4,13 @@ class Dragan {
     Dragan(int parametar){
         p = parametar;        
     }
-    int funkcija1Test(){
+    int funkcija1Test(int gage){
         return p;
     }
 }
 
 int pet(int test){
-    int y;
-    y= test;
-    return y;
+    return test;
 }
 
 int main() {
@@ -20,7 +18,7 @@ int main() {
     int test;
     randomVariable = 5;
     class Dragan draganInstance = new Dragan(randomVariable);
-    test = draganInstance.funkcija1Test();
+    test = draganInstance.funkcija1Test(randomVariable);
     return pet(randomVariable);
 }
 
