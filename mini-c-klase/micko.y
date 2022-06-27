@@ -661,15 +661,17 @@ argument
   : num_exp
     { 
       if(isClass==0){
-        if(parameter_map_function[fcall_idx][arg_counter] != get_type($1))
+        if(parameter_map_function[fcall_idx][arg_counter] != get_type($1)){
           err("incompatible arguments");
+        }
         arguments_array[arg_counter]=$1;
         arg_counter += 1;
 
     
       }else{
-        if(parameter_map_function[fcall_idx][arg_counter]  != get_type($1))
+        if(parameter_map_function[fcall_idx][arg_counter]  != get_type($1)){
           err("incompatible arguments");
+        }
         arguments_array[arg_counter]=$1;
         arg_counter += 1;
 

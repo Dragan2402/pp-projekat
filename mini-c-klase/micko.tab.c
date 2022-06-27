@@ -511,7 +511,7 @@ static const yytype_uint16 yyrline[] =
      421,   425,   425,   433,   438,   447,   454,   455,   433,   476,
      478,   482,   483,   487,   498,   502,   537,   539,   558,   559,
      570,   588,   594,   599,   602,   608,   607,   648,   651,   656,
-     657,   661,   682,   685,   691,   696,   690,   709,   719,   729
+     657,   661,   684,   687,   693,   698,   692,   711,   721,   731
 };
 #endif
 
@@ -2134,15 +2134,17 @@ yyreduce:
 #line 662 "micko.y"
     { 
       if(isClass==0){
-        if(parameter_map_function[fcall_idx][arg_counter] != get_type((yyvsp[(1) - (1)].i)))
-          err("incompatible type for argument in '$s' ",get_name(fcall_idx));
+        if(parameter_map_function[fcall_idx][arg_counter] != get_type((yyvsp[(1) - (1)].i))){
+          err("incompatible arguments");
+        }
         arguments_array[arg_counter]=(yyvsp[(1) - (1)].i);
         arg_counter += 1;
 
     
       }else{
-        if(parameter_map_function[fcall_idx][arg_counter]  != get_type((yyvsp[(1) - (1)].i)))
-          err("incompatible type for argument");
+        if(parameter_map_function[fcall_idx][arg_counter]  != get_type((yyvsp[(1) - (1)].i))){
+          err("incompatible arguments");
+        }
         arguments_array[arg_counter]=(yyvsp[(1) - (1)].i);
         arg_counter += 1;
 
@@ -2154,21 +2156,21 @@ yyreduce:
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 683 "micko.y"
+#line 685 "micko.y"
     { code("\n@exit%d:", (yyvsp[(1) - (1)].i)); ;}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 686 "micko.y"
+#line 688 "micko.y"
     { code("\n@exit%d:", (yyvsp[(1) - (3)].i)); ;}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 691 "micko.y"
+#line 693 "micko.y"
     {
         (yyval.i) = ++lab_num;
         code("\n@if%d:", lab_num);
@@ -2178,7 +2180,7 @@ yyreduce:
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 696 "micko.y"
+#line 698 "micko.y"
     {
         code("\n\t\t%s\t@false%d", opp_jumps[(yyvsp[(4) - (4)].i)], (yyvsp[(3) - (4)].i));
         code("\n@true%d:", (yyvsp[(3) - (4)].i));
@@ -2188,7 +2190,7 @@ yyreduce:
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 701 "micko.y"
+#line 703 "micko.y"
     {
         code("\n\t\tJMP \t@exit%d", (yyvsp[(3) - (7)].i));
         code("\n@false%d:", (yyvsp[(3) - (7)].i));
@@ -2199,7 +2201,7 @@ yyreduce:
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 710 "micko.y"
+#line 712 "micko.y"
     {
         if(get_type((yyvsp[(1) - (3)].i)) != get_type((yyvsp[(3) - (3)].i)))
           err("invalid operands: relational operator");
@@ -2211,7 +2213,7 @@ yyreduce:
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 720 "micko.y"
+#line 722 "micko.y"
     {
       if(get_type(fun_idx) == VOID)
         err("Function cannot return value");
@@ -2226,7 +2228,7 @@ yyreduce:
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 730 "micko.y"
+#line 732 "micko.y"
     {
       if(get_type(fun_idx) != VOID)
         warn("Function should return a value");
@@ -2237,7 +2239,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2241 "micko.tab.c"
+#line 2243 "micko.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2449,7 +2451,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 737 "micko.y"
+#line 739 "micko.y"
 
 
 int yyerror(char *s) {
