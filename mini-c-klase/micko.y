@@ -169,6 +169,7 @@ constructor
       err("Inavlid constructor name '%s', class name '%s'",$1,get_name(current_class_idx));
     }
     arg_counter = 0 ;
+    arg_position=1;
     code("\n%s:", $1);
     code("\n\t\tPUSH\t%%14");
     code("\n\t\tMOV \t%%15,%%14");
@@ -298,6 +299,7 @@ function
             code("\n%s:", $2);
             code("\n\t\tPUSH\t%%14");
             code("\n\t\tMOV \t%%15,%%14");
+            arg_position=1;
         }
       }
     _LPAREN parameter_list _RPAREN body
@@ -332,23 +334,25 @@ parameter
           if(lookup_symbol($2, PAR) != -1){
             err("Redefinition of parameter %s ", $2);
           }
-          insert_symbol($2, PAR, $1, 1, NO_ATR,NO_ATR);
+          insert_symbol($2, PAR, $1, arg_position, NO_ATR,NO_ATR);
           int num_params = get_atr1(fun_idx);
     
           int* param_types = parameter_map_function[fun_idx];
           param_types[num_params] = $1;
           num_params += 1;
+          arg_position +=1;
           set_atr1(fun_idx, num_params);
         }else{
         if(lookup_symbol($2, PAR) != -1){
           err("Redefinition of parameter %s ", $2);
           }
-        insert_symbol($2, PAR, $1, 1, NO_ATR,current_class_idx);
+        insert_symbol($2, PAR, $1, arg_position, NO_ATR,current_class_idx);
         int num_params = get_atr1(fun_idx);
 
         int* param_types = parameter_map_function[fun_idx];
         param_types[num_params] = $1;
         num_params += 1;
+        arg_position +=1;
         set_atr1(fun_idx, num_params);
         }
         
