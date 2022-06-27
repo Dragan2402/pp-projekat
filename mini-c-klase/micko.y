@@ -330,13 +330,15 @@ parameters
 parameter
   : _TYPE _ID
       {
+
+        
         if(isClass==0){
           if(lookup_symbol($2, PAR) != -1){
             err("Redefinition of parameter %s ", $2);
           }
           insert_symbol($2, PAR, $1, arg_position, NO_ATR,NO_ATR);
           int num_params = get_atr1(fun_idx);
-    
+
           int* param_types = parameter_map_function[fun_idx];
           param_types[num_params] = $1;
           num_params += 1;
@@ -346,12 +348,13 @@ parameter
         if(lookup_symbol($2, PAR) != -1){
           err("Redefinition of parameter %s ", $2);
           }
-        insert_symbol($2, PAR, $1, arg_position, NO_ATR,current_class_idx);
+        int idx = insert_symbol($2, PAR, $1, arg_position, NO_ATR,current_class_idx);
         int num_params = get_atr1(fun_idx);
 
         int* param_types = parameter_map_function[fun_idx];
         param_types[num_params] = $1;
         num_params += 1;
+
         arg_position +=1;
         set_atr1(fun_idx, num_params);
         }

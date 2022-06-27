@@ -505,13 +505,13 @@ static const yytype_uint16 yyrline[] =
 {
        0,    78,    78,    78,    78,    85,    87,    91,    92,    96,
      108,    96,   118,   120,   124,   124,   154,   156,   159,   160,
-     164,   176,   164,   185,   187,   191,   192,   196,   232,   234,
-     237,   260,   259,   319,   320,   324,   325,   329,   360,   359,
-     370,   372,   376,   410,   412,   416,   417,   418,   419,   420,
-     421,   425,   425,   433,   438,   447,   454,   455,   433,   476,
-     478,   482,   483,   487,   498,   502,   537,   539,   558,   559,
-     570,   588,   594,   599,   602,   608,   607,   648,   651,   656,
-     657,   661,   684,   687,   693,   698,   692,   711,   721,   731
+     164,   177,   164,   186,   188,   192,   193,   197,   233,   235,
+     238,   261,   260,   321,   322,   326,   327,   331,   367,   366,
+     377,   379,   383,   417,   419,   423,   424,   425,   426,   427,
+     428,   432,   432,   440,   445,   454,   461,   462,   440,   483,
+     485,   489,   490,   494,   505,   509,   544,   546,   565,   566,
+     577,   595,   601,   606,   609,   615,   614,   655,   658,   663,
+     664,   668,   691,   694,   700,   705,   699,   718,   728,   738
 };
 #endif
 
@@ -1622,6 +1622,7 @@ yyreduce:
       err("Inavlid constructor name '%s', class name '%s'",(yyvsp[(1) - (1)].s),get_name(current_class_idx));
     }
     arg_counter = 0 ;
+    arg_position=1;
     code("\n%s:", (yyvsp[(1) - (1)].s));
     code("\n\t\tPUSH\t%%14");
     code("\n\t\tMOV \t%%15,%%14");
@@ -1632,7 +1633,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 176 "micko.y"
+#line 177 "micko.y"
     {  
     code("\n\t\tJMP \t@%s_exit", (yyvsp[(1) - (7)].s));  
     code("\n@%s_exit:", (yyvsp[(1) - (7)].s));
@@ -1646,7 +1647,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 197 "micko.y"
+#line 198 "micko.y"
     {
       if((yyvsp[(1) - (2)].i) == VOID)
           err("attribute '%s' cannot be void",(yyvsp[(2) - (2)].s));
@@ -1684,7 +1685,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 238 "micko.y"
+#line 239 "micko.y"
     {
       int idx = lookup_symbol((yyvsp[(1) - (4)].s), ATR);
       if(idx == NO_INDEX)
@@ -1707,7 +1708,7 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 260 "micko.y"
+#line 261 "micko.y"
     {
         if (isClass==0){
             fun_idx = lookup_symbol((yyvsp[(2) - (2)].s), FUN);
@@ -1749,6 +1750,7 @@ yyreduce:
             code("\n%s:", (yyvsp[(2) - (2)].s));
             code("\n\t\tPUSH\t%%14");
             code("\n\t\tMOV \t%%15,%%14");
+            arg_position=1;
         }
       ;}
     break;
@@ -1756,7 +1758,7 @@ yyreduce:
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 304 "micko.y"
+#line 306 "micko.y"
     {
         if( (return_count == 0) && (get_type(fun_idx) != VOID) )
           warn("Function should return a value");
@@ -1774,36 +1776,41 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 319 "micko.y"
+#line 321 "micko.y"
     { set_atr1(fun_idx, 0); ;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 330 "micko.y"
+#line 332 "micko.y"
     {
+
+        
         if(isClass==0){
           if(lookup_symbol((yyvsp[(2) - (2)].s), PAR) != -1){
             err("Redefinition of parameter %s ", (yyvsp[(2) - (2)].s));
           }
-          insert_symbol((yyvsp[(2) - (2)].s), PAR, (yyvsp[(1) - (2)].i), 1, NO_ATR,NO_ATR);
+          insert_symbol((yyvsp[(2) - (2)].s), PAR, (yyvsp[(1) - (2)].i), arg_position, NO_ATR,NO_ATR);
           int num_params = get_atr1(fun_idx);
-    
+
           int* param_types = parameter_map_function[fun_idx];
           param_types[num_params] = (yyvsp[(1) - (2)].i);
           num_params += 1;
+          arg_position +=1;
           set_atr1(fun_idx, num_params);
         }else{
         if(lookup_symbol((yyvsp[(2) - (2)].s), PAR) != -1){
           err("Redefinition of parameter %s ", (yyvsp[(2) - (2)].s));
           }
-        insert_symbol((yyvsp[(2) - (2)].s), PAR, (yyvsp[(1) - (2)].i), 1, NO_ATR,current_class_idx);
+        int idx = insert_symbol((yyvsp[(2) - (2)].s), PAR, (yyvsp[(1) - (2)].i), arg_position, NO_ATR,current_class_idx);
         int num_params = get_atr1(fun_idx);
 
         int* param_types = parameter_map_function[fun_idx];
         param_types[num_params] = (yyvsp[(1) - (2)].i);
         num_params += 1;
+
+        arg_position +=1;
         set_atr1(fun_idx, num_params);
         }
         
@@ -1813,7 +1820,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 360 "micko.y"
+#line 367 "micko.y"
     {
         if(var_num)
           code("\n\t\tSUBS\t%%15,$%d,%%15", 4*var_num);
@@ -1824,7 +1831,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 377 "micko.y"
+#line 384 "micko.y"
     {
         if((yyvsp[(1) - (3)].i) == VOID)
           err("variable '%s' cannot have type void",(yyvsp[(2) - (3)].s));
@@ -1861,7 +1868,7 @@ yyreduce:
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 425 "micko.y"
+#line 432 "micko.y"
     {
     int indx = lookup_symbol((yyvsp[(1) - (1)].s),INST);
     if(indx==NO_INDEX)
@@ -1873,7 +1880,7 @@ yyreduce:
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 433 "micko.y"
+#line 440 "micko.y"
     {
       isClass=1;
       if(lookup_symbol((yyvsp[(2) - (2)].s), CLAS) == NO_INDEX)
@@ -1884,7 +1891,7 @@ yyreduce:
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 438 "micko.y"
+#line 445 "micko.y"
     {
     int idx=lookup_symbol((yyvsp[(4) - (4)].s),VAR|PAR|INST);
     if(idx == NO_INDEX){
@@ -1899,7 +1906,7 @@ yyreduce:
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 447 "micko.y"
+#line 454 "micko.y"
     {
       if(lookup_symbol((yyvsp[(8) - (8)].s), CLAS) == NO_INDEX)
         err("'%s' is not a class", (yyvsp[(8) - (8)].s));
@@ -1912,14 +1919,14 @@ yyreduce:
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 454 "micko.y"
+#line 461 "micko.y"
     {instance_declaration_arg_counter = 0;;}
     break;
 
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 455 "micko.y"
+#line 462 "micko.y"
     {
       int class_idx = lookup_symbol((yyvsp[(2) - (12)].s), CLAS);
       if(get_atr1(class_idx) != instance_declaration_arg_counter)
@@ -1941,7 +1948,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 488 "micko.y"
+#line 495 "micko.y"
     {
     if(parameter_map[get_atr3(current_instance_idx)][instance_declaration_arg_counter] != get_type((yyvsp[(1) - (1)].i)))
       err("incompatible type for argument in '%s'",get_name(get_atr3(current_instance_idx)));
@@ -1954,7 +1961,7 @@ yyreduce:
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 503 "micko.y"
+#line 510 "micko.y"
     {
         if(isClass==0){
           int idx = lookup_symbol((yyvsp[(1) - (4)].s), VAR|PAR);
@@ -1991,7 +1998,7 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 540 "micko.y"
+#line 547 "micko.y"
     {
         if(get_type((yyvsp[(1) - (3)].i)) != get_type((yyvsp[(3) - (3)].i)))
           err("invalid operands: arithmetic operation");
@@ -2012,7 +2019,7 @@ yyreduce:
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 560 "micko.y"
+#line 567 "micko.y"
     {
       isClass=1;
       int instance_indx = lookup_symbol((yyvsp[(1) - (3)].s),INST);
@@ -2028,7 +2035,7 @@ yyreduce:
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 571 "micko.y"
+#line 578 "micko.y"
     {
         if( isClass==0){
           (yyval.i) = lookup_symbol((yyvsp[(1) - (1)].s), VAR|PAR);
@@ -2051,7 +2058,7 @@ yyreduce:
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 589 "micko.y"
+#line 596 "micko.y"
     {
         (yyval.i) = take_reg();
         gen_mov(FUN_REG, (yyval.i));
@@ -2061,28 +2068,28 @@ yyreduce:
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 595 "micko.y"
+#line 602 "micko.y"
     { (yyval.i) = (yyvsp[(2) - (3)].i); ;}
     break;
 
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 600 "micko.y"
+#line 607 "micko.y"
     { (yyval.i) = insert_literal((yyvsp[(1) - (1)].s), INT); ;}
     break;
 
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 603 "micko.y"
+#line 610 "micko.y"
     { (yyval.i) = insert_literal((yyvsp[(1) - (1)].s), UINT); ;}
     break;
 
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 608 "micko.y"
+#line 615 "micko.y"
     {
         arg_counter=0;
         if(isClass==0){
@@ -2105,7 +2112,7 @@ yyreduce:
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 626 "micko.y"
+#line 633 "micko.y"
     {
 
           if(get_atr1(fcall_idx) != arg_counter)
@@ -2131,7 +2138,7 @@ yyreduce:
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 662 "micko.y"
+#line 669 "micko.y"
     { 
       if(isClass==0){
         if(parameter_map_function[fcall_idx][arg_counter] != get_type((yyvsp[(1) - (1)].i))){
@@ -2156,21 +2163,21 @@ yyreduce:
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 685 "micko.y"
+#line 692 "micko.y"
     { code("\n@exit%d:", (yyvsp[(1) - (1)].i)); ;}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 688 "micko.y"
+#line 695 "micko.y"
     { code("\n@exit%d:", (yyvsp[(1) - (3)].i)); ;}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 693 "micko.y"
+#line 700 "micko.y"
     {
         (yyval.i) = ++lab_num;
         code("\n@if%d:", lab_num);
@@ -2180,7 +2187,7 @@ yyreduce:
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 698 "micko.y"
+#line 705 "micko.y"
     {
         code("\n\t\t%s\t@false%d", opp_jumps[(yyvsp[(4) - (4)].i)], (yyvsp[(3) - (4)].i));
         code("\n@true%d:", (yyvsp[(3) - (4)].i));
@@ -2190,7 +2197,7 @@ yyreduce:
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 703 "micko.y"
+#line 710 "micko.y"
     {
         code("\n\t\tJMP \t@exit%d", (yyvsp[(3) - (7)].i));
         code("\n@false%d:", (yyvsp[(3) - (7)].i));
@@ -2201,7 +2208,7 @@ yyreduce:
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 712 "micko.y"
+#line 719 "micko.y"
     {
         if(get_type((yyvsp[(1) - (3)].i)) != get_type((yyvsp[(3) - (3)].i)))
           err("invalid operands: relational operator");
@@ -2213,7 +2220,7 @@ yyreduce:
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 722 "micko.y"
+#line 729 "micko.y"
     {
       if(get_type(fun_idx) == VOID)
         err("Function cannot return value");
@@ -2228,7 +2235,7 @@ yyreduce:
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 732 "micko.y"
+#line 739 "micko.y"
     {
       if(get_type(fun_idx) != VOID)
         warn("Function should return a value");
@@ -2239,7 +2246,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2243 "micko.tab.c"
+#line 2250 "micko.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2451,7 +2458,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 739 "micko.y"
+#line 746 "micko.y"
 
 
 int yyerror(char *s) {

@@ -64,7 +64,7 @@ setAgeHeight:
 		MOV 	%15,%14
 @setAgeHeight_body:
 		MOV 	8(%14),age
-		MOV 	8(%14),height
+		MOV 	12(%14),height
 @setAgeHeight_exit:
 		MOV 	%14,%15
 		POP 	%14

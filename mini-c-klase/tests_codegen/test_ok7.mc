@@ -51,5 +51,5 @@ int main() {
 	
 	class Person personInstance = new Person(a,h,w,s);
     	personInstance.setAgeHeight(24,179);
-	return personInstance.getSumPlusFive();
+	return personInstance.getSumPlusFive(add);
 }
