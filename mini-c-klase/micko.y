@@ -26,6 +26,9 @@
   int fcall_idx = -1;
   int instance_index=-1;
   int lab_num = -1;
+  int return_count=0;
+  int* parameter_map_function[128];
+
 
   int arguments_array[128];
   int* parameter_map[128];
@@ -91,6 +94,7 @@ classes_existing_list
 
 class
   : _CLASS _ID {
+        
         current_class_idx = lookup_symbol($2, CLAS);
         if(current_class_idx == NO_INDEX){
           current_class_idx = insert_symbol($2, CLAS, NO_TYPE, 0, NO_ATR,NO_ATR);
@@ -119,6 +123,8 @@ attributes_list
 attribute
   : _TYPE _ID {
       {
+        if($1 == VOID)
+          err("attribute '%s' cannot be void",$2);
         int atr_idx = lookup_symbol($2, ATR);
         if(atr_idx == NO_INDEX){
           int idx=insert_symbol($2, ATR, $1, attributes_counter, NO_ATR,current_class_idx);
@@ -173,7 +179,7 @@ constructor
     code("\n\t\tMOV \t%%14,%%15");
     code("\n\t\tPOP \t%%14");
     code("\n\t\tRET");
-    //clear_symbols(get_last_element() - arg_counter +1);
+    clear_symbols(get_last_element() - arg_counter +1);
   } _RBRACKET;
 
 constructor_parameters
@@ -189,6 +195,8 @@ constructor_existing_parameters
 constructor_parameter
   : _TYPE _ID
     {
+      if($1 == VOID)
+          err("attribute '%s' cannot be void",$2);
       if(lookup_symbol($2, PAR) != -1){
         err("Redefinition of parameter %s ", $2);
       }else{
@@ -252,11 +260,17 @@ function
       {
         if (isClass==0){
             fun_idx = lookup_symbol($2, FUN);
-            if(fun_idx == NO_INDEX)
+            if(fun_idx == NO_INDEX){
+              int* param_types = (int*) malloc(sizeof(int)*128);
               fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,NO_ATR);
+              parameter_map_function[fun_idx] = param_types;
+            }
             else
               if(get_atr3(fun_idx) == NO_ATR){
+                int* param_types = (int*) malloc(sizeof(int)*128);
                 fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,NO_ATR);
+                parameter_map_function[fun_idx] = param_types;
+
               }else{
                 err("redefinition of function '%s'", $2);
                 }
@@ -268,13 +282,17 @@ function
         else{
             fun_idx = lookup_symbol($2, FUN);
             if(fun_idx == NO_INDEX){
+              int* param_types = (int*) malloc(sizeof(int)*128);
               fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,current_class_idx);   
+              parameter_map_function[fun_idx] = param_types;
             }
             else {
               if(get_atr3(fun_idx) == current_class_idx){
                 err("redefinition of function '%s' in class '%s", $2, get_name(current_class_idx));
               }else{
+                  int* param_types = (int*) malloc(sizeof(int)*128);
                   fun_idx = insert_symbol($2, FUN, $1, NO_ATR, NO_ATR,current_class_idx);
+                  parameter_map_function[fun_idx] = param_types;
               }
             }
             code("\n%s:", $2);
@@ -282,8 +300,11 @@ function
             code("\n\t\tMOV \t%%15,%%14");
         }
       }
-    _LPAREN parameter _RPAREN body
+    _LPAREN parameter_list _RPAREN body
       {
+        if( (return_count == 0) && (get_type(fun_idx) != VOID) )
+          warn("Function should return a value");
+        return_count = 0;
         clear_symbols(fun_idx + 1);
         var_num = 0;
         
@@ -293,21 +314,42 @@ function
         code("\n\t\tRET");
       }
   ;
+parameter_list
+  : 
+  { set_atr1(fun_idx, 0); }
+  | parameters
+;
+
+parameters
+  : parameter
+  | parameters _COMMA parameter
+  ;
 
 parameter
-  : /* empty */
-      { set_atr1(fun_idx, 0); }
-
-  | _TYPE _ID
+  : _TYPE _ID
       {
         if(isClass==0){
-        insert_symbol($2, PAR, $1, 1, NO_ATR,NO_ATR);
-        set_atr1(fun_idx, 1);
-        set_atr2(fun_idx, $1);
+          if(lookup_symbol($2, PAR) != -1){
+            err("Redefinition of parameter %s ", $2);
+          }
+          insert_symbol($2, PAR, $1, 1, NO_ATR,NO_ATR);
+          int num_params = get_atr1(fun_idx);
+    
+          int* param_types = parameter_map_function[fun_idx];
+          param_types[num_params] = $1;
+          num_params += 1;
+          set_atr1(fun_idx, num_params);
         }else{
+        if(lookup_symbol($2, PAR) != -1){
+          err("Redefinition of parameter %s ", $2);
+          }
         insert_symbol($2, PAR, $1, 1, NO_ATR,current_class_idx);
-        set_atr1(fun_idx, 1);
-        set_atr2(fun_idx, $1);
+        int num_params = get_atr1(fun_idx);
+
+        int* param_types = parameter_map_function[fun_idx];
+        param_types[num_params] = $1;
+        num_params += 1;
+        set_atr1(fun_idx, num_params);
         }
         
       }
@@ -333,6 +375,8 @@ variable_list
 variable
   : _TYPE _ID _SEMICOLON
       {
+        if($1 == VOID)
+          err("variable '%s' cannot have type void",$2);
         if (isClass==0){
           int var_indx = lookup_symbol($2, VAR|PAR);
           if(var_indx == NO_INDEX)
@@ -370,11 +414,15 @@ statement_list
 
 statement
   : compound_statement
+  | class_function
   | assignment_statement
   | if_statement
   | class_declaration
   | return_statement
   ;
+
+class_function
+  : _ID _DOT function_call  _SEMICOLON;
 
 class_declaration
   : _CLASS _ID {
@@ -553,6 +601,7 @@ literal
 function_call
   : _ID 
       {
+        arg_counter=0;
         if(isClass==0){
         fcall_idx = lookup_symbol($1, FUN);
         if(fcall_idx == NO_INDEX)
@@ -568,40 +617,58 @@ function_call
           }
         }
       }
-    _LPAREN argument _RPAREN
+    _LPAREN argument_list _RPAREN
       {
 
-          if(get_atr1(fcall_idx) != $4)
-            err("wrong number of arguments");
+          if(get_atr1(fcall_idx) != arg_counter)
+            err("wrong number of arguments for function '%s' number of arguments '%d' ",get_name(fcall_idx), arg_counter);
+          
+          for(int i=arg_counter-1; i >= 0 ; i--){
+            int indx = arguments_array[i];
+            free_if_reg(indx);
+            code("\n\t\tPUSH\t");
+            gen_sym_name(indx);
+           }
+
           code("\n\t\tCALL\t%s", get_name(fcall_idx));
-          if($4 > 0)
-            code("\n\t\tADDS\t%%15,$%d,%%15", $4 * 4);
+          if(arg_counter > 0)
+            code("\n\t\tADDS\t%%15,$%d,%%15", arg_counter * 4);
           set_type(FUN_REG, get_type(fcall_idx));
           $$ = FUN_REG;
+          arg_counter=0;
           
       }
   ;
 
-argument
+argument_list
   : /* empty */
-    { $$ = 0; }
+   
+  | arguments
+ 
+  ;
 
-  | num_exp
+arguments
+  : argument
+  | arguments _COMMA argument
+  ;
+
+argument
+  : num_exp
     { 
       if(isClass==0){
-        if(get_type(fcall_idx) != get_type($1))
-          err("incompatible type for argument");
-        free_if_reg($1);
-        code("\n\t\tPUSH\t");
-        gen_sym_name($1);
-        $$ = 1;
+        if(parameter_map_function[fcall_idx][arg_counter] != get_type($1))
+          err("incompatible type for argument in '$s' ",get_name(fcall_idx));
+        arguments_array[arg_counter]=$1;
+        arg_counter += 1;
+
+    
       }else{
-        if(get_type(fcall_idx) != get_type($1))
+        if(parameter_map_function[fcall_idx][arg_counter]  != get_type($1))
           err("incompatible type for argument");
-        free_if_reg($1);
-        code("\n\t\tPUSH\t");
-        gen_sym_name($1);
-        $$ = 1;
+        arguments_array[arg_counter]=$1;
+        arg_counter += 1;
+
+    
       }
     }
 ;
@@ -646,13 +713,20 @@ rel_exp
 return_statement
   : _RETURN num_exp _SEMICOLON
       {
-        print_symtab();
-        if(get_type(fun_idx) != get_type($2)){
-          err("incompatible types in return");
-          }
+      if(get_type(fun_idx) == VOID)
+        err("Function cannot return value");
+      else if(get_type(fun_idx) != get_type($2))
+        err("incompatible types in return");
+      return_count++;
         gen_mov($2, FUN_REG);
         code("\n\t\tJMP \t@%s_exit", get_name(fun_idx));        
       }
+    | _RETURN _SEMICOLON
+    {
+      if(get_type(fun_idx) != VOID)
+        warn("Function should return a value");
+      return_count++; 
+    }
   ;
 
 %%

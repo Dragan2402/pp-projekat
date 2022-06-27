@@ -23,7 +23,7 @@ extern int yyerror(char *s);
           if (++out_lin > 2000) err("Too many output lines"), exit(1); })
 
 //tipovi podataka
-enum types { NO_TYPE, INT, UINT };
+enum types { NO_TYPE, INT, UINT, VOID};
 
 //vrste simbola (moze ih biti maksimalno 32)
 enum kinds { NO_KIND = 0x1, REG = 0x2, LIT = 0x4, 

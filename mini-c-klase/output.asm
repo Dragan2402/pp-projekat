@@ -1,68 +1,93 @@
 
-a:
+age:
 		WORD	1
-b:
+height:
 		WORD	1
-Rectangle:
+weight:
+		WORD	1
+shoeSize:
+		WORD	1
+Person:
 		PUSH	%14
 		MOV 	%15,%14
-		MOV 	8(%14),a
-		MOV 	12(%14),b
-		JMP 	@Rectangle_exit
-@Rectangle_exit:
+		MOV 	8(%14),age
+		MOV 	12(%14),height
+		MOV 	16(%14),weight
+		MOV 	20(%14),shoeSize
+		JMP 	@Person_exit
+@Person_exit:
 		MOV 	%14,%15
 		POP 	%14
 		RET
-getA:
+getAge:
 		PUSH	%14
 		MOV 	%15,%14
-@getA_body:
-		ADDS	a,8(%14),%0
+@getAge_body:
+		MOV 	age,%13
+		JMP 	@getAge_exit
+@getAge_exit:
+		MOV 	%14,%15
+		POP 	%14
+		RET
+getHeight:
+		PUSH	%14
+		MOV 	%15,%14
+@getHeight_body:
+		MOV 	height,%13
+		JMP 	@getHeight_exit
+@getHeight_exit:
+		MOV 	%14,%15
+		POP 	%14
+		RET
+getWeight:
+		PUSH	%14
+		MOV 	%15,%14
+@getWeight_body:
+		MOV 	weight,%13
+		JMP 	@getWeight_exit
+@getWeight_exit:
+		MOV 	%14,%15
+		POP 	%14
+		RET
+getShoe:
+		PUSH	%14
+		MOV 	%15,%14
+@getShoe_body:
+		MOV 	shoeSize,%13
+		JMP 	@getShoe_exit
+@getShoe_exit:
+		MOV 	%14,%15
+		POP 	%14
+		RET
+setAgeHeight:
+		PUSH	%14
+		MOV 	%15,%14
+@setAgeHeight_body:
+		MOV 	8(%14),age
+		MOV 	8(%14),height
+@setAgeHeight_exit:
+		MOV 	%14,%15
+		POP 	%14
+		RET
+getSumPlusFive:
+		PUSH	%14
+		MOV 	%15,%14
+@getSumPlusFive_body:
+		CALL	getAge
+		MOV 	%13,%0
+		CALL	getHeight
+		MOV 	%13,%1
+		ADDS	%0,%1,%0
+		CALL	getWeight
+		MOV 	%13,%1
+		ADDS	%0,%1,%0
+		CALL	getShoe
+		MOV 	%13,%1
+		ADDS	%0,%1,%0
+		ADDS	%0,8(%14),%0
 		MOV 	%0,%13
-		JMP 	@getA_exit
-@getA_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
-getB:
-		PUSH	%14
-		MOV 	%15,%14
-@getB_body:
-		MOV 	b,%13
-		JMP 	@getB_exit
-@getB_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
-r:
-		WORD	1
-Circle:
-		PUSH	%14
-		MOV 	%15,%14
-		MOV 	16(%14),r
-		JMP 	@Circle_exit
-@Circle_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
-getR:
-		PUSH	%14
-		MOV 	%15,%14
-@getR_body:
-		MOV 	r,%13
-		JMP 	@getR_exit
-@getR_exit:
-		MOV 	%14,%15
-		POP 	%14
-		RET
-getRFull:
-		PUSH	%14
-		MOV 	%15,%14
-@getRFull_body:
-		ADDS	r,r,%0
-		MOV 	%0,%13
-		JMP 	@getRFull_exit
-@getRFull_exit:
+		JMP 	@getSumPlusFive_exit
+@getSumPlusFive_exit:
 		MOV 	%14,%15
 		POP 	%14
 		RET
@@ -71,23 +96,24 @@ main:
 		MOV 	%15,%14
 		SUBS	%15,$20,%15
 @main_body:
-		MOV 	$5,-4(%14)
-		MOV 	$6,-8(%14)
+		MOV 	$25,-4(%14)
+		MOV 	$180,-8(%14)
+		MOV 	$80,-12(%14)
+		MOV 	$43,-16(%14)
 		MOV 	$5,-20(%14)
+		PUSH	-16(%14)
+		PUSH	-12(%14)
 		PUSH	-8(%14)
 		PUSH	-4(%14)
-		CALL	Rectangle
+		CALL	Person
+		ADDS	%15,$16,%15
+		PUSH	$60
+		PUSH	$24
+		CALL	setAgeHeight
 		ADDS	%15,$8,%15
 		PUSH	-20(%14)
-		CALL	getA
+		CALL	getSumPlusFive
 		ADDS	%15,$4,%15
-		MOV 	%13,-12(%14)
-		CALL	getB
-		MOV 	%13,-16(%14)
-		PUSH	-4(%14)
-		CALL	Circle
-		ADDS	%15,$4,%15
-		CALL	getRFull
 		MOV 	%13,%13
 		JMP 	@main_exit
 @main_exit:
