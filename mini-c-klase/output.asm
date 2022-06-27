@@ -107,7 +107,7 @@ main:
 		PUSH	-4(%14)
 		CALL	Person
 		ADDS	%15,$16,%15
-		PUSH	$60
+		PUSH	$179
 		PUSH	$24
 		CALL	setAgeHeight
 		ADDS	%15,$8,%15

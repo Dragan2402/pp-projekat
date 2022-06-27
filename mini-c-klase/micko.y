@@ -422,7 +422,12 @@ statement
   ;
 
 class_function
-  : _ID _DOT function_call  _SEMICOLON;
+  : _ID {
+    int indx = lookup_symbol($1,INST);
+    if(indx==NO_INDEX)
+      err("unknown instance '%s'",$1);
+    current_instance_idx=indx;
+  }_DOT function_call  _SEMICOLON;
 
 class_declaration
   : _CLASS _ID {
