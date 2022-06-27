@@ -54,109 +54,125 @@ Gramatika
 
    30 $@8: /* prazno */
 
-   31 function: _TYPE _ID $@8 _LPAREN parameter _RPAREN body
+   31 function: _TYPE _ID $@8 _LPAREN parameter_list _RPAREN body
 
-   32 parameter: /* prazno */
-   33          | _TYPE _ID
+   32 parameter_list: /* prazno */
+   33               | parameters
 
-   34 $@9: /* prazno */
+   34 parameters: parameter
+   35           | parameters _COMMA parameter
 
-   35 body: _LBRACKET variable_list $@9 statement_list _RBRACKET
+   36 parameter: _TYPE _ID
 
-   36 variable_list: /* prazno */
-   37              | variable_list variable
+   37 $@9: /* prazno */
 
-   38 variable: _TYPE _ID _SEMICOLON
+   38 body: _LBRACKET variable_list $@9 statement_list _RBRACKET
 
-   39 statement_list: /* prazno */
-   40               | statement_list statement
+   39 variable_list: /* prazno */
+   40              | variable_list variable
 
-   41 statement: compound_statement
-   42          | assignment_statement
-   43          | if_statement
-   44          | class_declaration
-   45          | return_statement
+   41 variable: _TYPE _ID _SEMICOLON
 
-   46 $@10: /* prazno */
+   42 statement_list: /* prazno */
+   43               | statement_list statement
 
-   47 $@11: /* prazno */
+   44 statement: compound_statement
+   45          | class_function
+   46          | assignment_statement
+   47          | if_statement
+   48          | class_declaration
+   49          | return_statement
 
-   48 $@12: /* prazno */
+   50 $@10: /* prazno */
 
-   49 $@13: /* prazno */
+   51 class_function: _ID $@10 _DOT function_call _SEMICOLON
 
-   50 $@14: /* prazno */
+   52 $@11: /* prazno */
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   53 $@12: /* prazno */
 
-   52 class_argument_list: /* prazno */
-   53                    | class_arguments
+   54 $@13: /* prazno */
 
-   54 class_arguments: class_argument
-   55                | class_arguments _COMMA class_argument
+   55 $@14: /* prazno */
 
-   56 class_argument: num_exp
+   56 $@15: /* prazno */
 
-   57 compound_statement: _LBRACKET statement_list _RBRACKET
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
 
-   58 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON
+   58 class_argument_list: /* prazno */
+   59                    | class_arguments
 
-   59 num_exp: exp
-   60        | num_exp _AROP exp
+   60 class_arguments: class_argument
+   61                | class_arguments _COMMA class_argument
 
-   61 exp: literal
-   62    | _ID _DOT function_call
-   63    | _ID
-   64    | function_call
-   65    | _LPAREN num_exp _RPAREN
+   62 class_argument: num_exp
 
-   66 literal: _INT_NUMBER
-   67        | _UINT_NUMBER
+   63 compound_statement: _LBRACKET statement_list _RBRACKET
 
-   68 $@15: /* prazno */
+   64 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON
 
-   69 function_call: _ID $@15 _LPAREN argument _RPAREN
+   65 num_exp: exp
+   66        | num_exp _AROP exp
 
-   70 argument: /* prazno */
-   71         | num_exp
+   67 exp: literal
+   68    | _ID _DOT function_call
+   69    | _ID
+   70    | function_call
+   71    | _LPAREN num_exp _RPAREN
 
-   72 if_statement: if_part
-   73             | if_part _ELSE statement
+   72 literal: _INT_NUMBER
+   73        | _UINT_NUMBER
 
-   74 @16: /* prazno */
+   74 $@16: /* prazno */
 
-   75 $@17: /* prazno */
+   75 function_call: _ID $@16 _LPAREN argument_list _RPAREN
 
-   76 if_part: _IF _LPAREN @16 rel_exp $@17 _RPAREN statement
+   76 argument_list: /* prazno */
+   77              | arguments
 
-   77 rel_exp: num_exp _RELOP num_exp
+   78 arguments: argument
+   79          | arguments _COMMA argument
 
-   78 return_statement: _RETURN num_exp _SEMICOLON
+   80 argument: num_exp
+
+   81 if_statement: if_part
+   82             | if_part _ELSE statement
+
+   83 @17: /* prazno */
+
+   84 $@18: /* prazno */
+
+   85 if_part: _IF _LPAREN @17 rel_exp $@18 _RPAREN statement
+
+   86 rel_exp: num_exp _RELOP num_exp
+
+   87 return_statement: _RETURN num_exp _SEMICOLON
+   88                 | _RETURN _SEMICOLON
 
 
 Završni znakovi, sa pravilima gdje se pojavljuju
 
 $end (0) 0
 error (256)
-_TYPE (258) 14 26 31 33 38
-_IF (259) 76
-_ELSE (260) 73
-_RETURN (261) 78
-_CLASS (262) 10 51
-_NEW (263) 51
-_ID (264) 10 14 21 26 29 31 33 38 51 58 62 63 69
-_INT_NUMBER (265) 66
-_UINT_NUMBER (266) 67
-_LPAREN (267) 21 31 51 65 69 76
-_RPAREN (268) 21 31 51 65 69 76
-_LBRACKET (269) 10 21 35 57
-_RBRACKET (270) 10 21 35 57
-_ASSIGN (271) 29 51 58
-_SEMICOLON (272) 14 29 38 51 58 78
-_DOT (273) 62
-_COMMA (274) 25 55
-_AROP (275) 60
-_RELOP (276) 77
+_TYPE (258) 14 26 31 36 41
+_IF (259) 85
+_ELSE (260) 82
+_RETURN (261) 87 88
+_CLASS (262) 10 57
+_NEW (263) 57
+_ID (264) 10 14 21 26 29 31 36 41 51 57 64 68 69 75
+_INT_NUMBER (265) 72
+_UINT_NUMBER (266) 73
+_LPAREN (267) 21 31 57 71 75 85
+_RPAREN (268) 21 31 57 71 75 85
+_LBRACKET (269) 10 21 38 63
+_RBRACKET (270) 10 21 38 63
+_ASSIGN (271) 29 57 64
+_SEMICOLON (272) 14 29 41 51 57 64 87 88
+_DOT (273) 51 68
+_COMMA (274) 25 35 61 79
+_AROP (275) 66
+_RELOP (276) 86
 ONLY_IF (277)
 
 
@@ -210,66 +226,78 @@ function (45)
    s lijeva: 31,s desna: 17 18
 $@8 (46)
    s lijeva: 30,s desna: 31
-parameter (47)
+parameter_list (47)
    s lijeva: 32 33,s desna: 31
-body (48)
-   s lijeva: 35,s desna: 31
-$@9 (49)
-   s lijeva: 34,s desna: 35
-variable_list (50)
-   s lijeva: 36 37,s desna: 35 37
-variable (51)
-   s lijeva: 38,s desna: 37
-statement_list (52)
-   s lijeva: 39 40,s desna: 35 40 57
-statement (53)
-   s lijeva: 41 42 43 44 45,s desna: 40 73 76
-class_declaration (54)
-   s lijeva: 51,s desna: 44
-$@10 (55)
-   s lijeva: 46,s desna: 51
-$@11 (56)
-   s lijeva: 47,s desna: 51
-$@12 (57)
-   s lijeva: 48,s desna: 51
-$@13 (58)
-   s lijeva: 49,s desna: 51
-$@14 (59)
+parameters (48)
+   s lijeva: 34 35,s desna: 33 35
+parameter (49)
+   s lijeva: 36,s desna: 34 35
+body (50)
+   s lijeva: 38,s desna: 31
+$@9 (51)
+   s lijeva: 37,s desna: 38
+variable_list (52)
+   s lijeva: 39 40,s desna: 38 40
+variable (53)
+   s lijeva: 41,s desna: 40
+statement_list (54)
+   s lijeva: 42 43,s desna: 38 43 63
+statement (55)
+   s lijeva: 44 45 46 47 48 49,s desna: 43 82 85
+class_function (56)
+   s lijeva: 51,s desna: 45
+$@10 (57)
    s lijeva: 50,s desna: 51
-class_argument_list (60)
-   s lijeva: 52 53,s desna: 51
-class_arguments (61)
-   s lijeva: 54 55,s desna: 53 55
-class_argument (62)
-   s lijeva: 56,s desna: 54 55
-compound_statement (63)
-   s lijeva: 57,s desna: 41
-assignment_statement (64)
-   s lijeva: 58,s desna: 42
-num_exp (65)
-   s lijeva: 59 60,s desna: 56 58 60 65 71 77 78
-exp (66)
-   s lijeva: 61 62 63 64 65,s desna: 59 60
-literal (67)
-   s lijeva: 66 67,s desna: 61
-function_call (68)
-   s lijeva: 69,s desna: 62 64
-$@15 (69)
-   s lijeva: 68,s desna: 69
-argument (70)
-   s lijeva: 70 71,s desna: 69
-if_statement (71)
-   s lijeva: 72 73,s desna: 43
-if_part (72)
-   s lijeva: 76,s desna: 72 73
-@16 (73)
-   s lijeva: 74,s desna: 76
-$@17 (74)
-   s lijeva: 75,s desna: 76
-rel_exp (75)
-   s lijeva: 77,s desna: 76
-return_statement (76)
-   s lijeva: 78,s desna: 45
+class_declaration (58)
+   s lijeva: 57,s desna: 48
+$@11 (59)
+   s lijeva: 52,s desna: 57
+$@12 (60)
+   s lijeva: 53,s desna: 57
+$@13 (61)
+   s lijeva: 54,s desna: 57
+$@14 (62)
+   s lijeva: 55,s desna: 57
+$@15 (63)
+   s lijeva: 56,s desna: 57
+class_argument_list (64)
+   s lijeva: 58 59,s desna: 57
+class_arguments (65)
+   s lijeva: 60 61,s desna: 59 61
+class_argument (66)
+   s lijeva: 62,s desna: 60 61
+compound_statement (67)
+   s lijeva: 63,s desna: 44
+assignment_statement (68)
+   s lijeva: 64,s desna: 46
+num_exp (69)
+   s lijeva: 65 66,s desna: 62 64 66 71 80 86 87
+exp (70)
+   s lijeva: 67 68 69 70 71,s desna: 65 66
+literal (71)
+   s lijeva: 72 73,s desna: 67
+function_call (72)
+   s lijeva: 75,s desna: 51 68 70
+$@16 (73)
+   s lijeva: 74,s desna: 75
+argument_list (74)
+   s lijeva: 76 77,s desna: 75
+arguments (75)
+   s lijeva: 78 79,s desna: 77 79
+argument (76)
+   s lijeva: 80,s desna: 78 79
+if_statement (77)
+   s lijeva: 81 82,s desna: 47
+if_part (78)
+   s lijeva: 85,s desna: 81 82
+@17 (79)
+   s lijeva: 83,s desna: 85
+$@18 (80)
+   s lijeva: 84,s desna: 85
+rel_exp (81)
+   s lijeva: 86,s desna: 85
+return_statement (82)
+   s lijeva: 87 88,s desna: 49
 
 
 stanje 0
@@ -379,7 +407,7 @@ stanje 11
 
 stanje 12
 
-   31 function: _TYPE . _ID $@8 _LPAREN parameter _RPAREN body
+   31 function: _TYPE . _ID $@8 _LPAREN parameter_list _RPAREN body
 
     _ID  shift, and go to state 16
 
@@ -414,7 +442,7 @@ stanje 15
 
 stanje 16
 
-   31 function: _TYPE _ID . $@8 _LPAREN parameter _RPAREN body
+   31 function: _TYPE _ID . $@8 _LPAREN parameter_list _RPAREN body
 
     $default  reduce using rule 30 ($@8)
 
@@ -442,7 +470,7 @@ stanje 18
 
 stanje 19
 
-   31 function: _TYPE _ID $@8 . _LPAREN parameter _RPAREN body
+   31 function: _TYPE _ID $@8 . _LPAREN parameter_list _RPAREN body
 
     _LPAREN  shift, and go to state 24
 
@@ -481,13 +509,15 @@ stanje 23
 
 stanje 24
 
-   31 function: _TYPE _ID $@8 _LPAREN . parameter _RPAREN body
+   31 function: _TYPE _ID $@8 _LPAREN . parameter_list _RPAREN body
 
     _TYPE  shift, and go to state 28
 
-    $default  reduce using rule 32 (parameter)
+    $default  reduce using rule 32 (parameter_list)
 
-    parameter  go to state 29
+    parameter_list  go to state 29
+    parameters      go to state 30
+    parameter       go to state 31
 
 
 stanje 25
@@ -496,14 +526,14 @@ stanje 25
 
     $default  reduce using rule 13 ($@5)
 
-    $@5  go to state 30
+    $@5  go to state 32
 
 
 stanje 26
 
    21 constructor: _ID $@6 . _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list $@7 _RBRACKET
 
-    _LPAREN  shift, and go to state 31
+    _LPAREN  shift, and go to state 33
 
 
 stanje 27
@@ -514,53 +544,70 @@ stanje 27
 
     $default  reduce using rule 15 (functions_list)
 
-    functions_list  go to state 32
-    function_list   go to state 33
+    functions_list  go to state 34
+    function_list   go to state 35
     function        go to state 14
 
 
 stanje 28
 
-   33 parameter: _TYPE . _ID
+   36 parameter: _TYPE . _ID
 
-    _ID  shift, and go to state 34
+    _ID  shift, and go to state 36
 
 
 stanje 29
 
-   31 function: _TYPE _ID $@8 _LPAREN parameter . _RPAREN body
+   31 function: _TYPE _ID $@8 _LPAREN parameter_list . _RPAREN body
 
-    _RPAREN  shift, and go to state 35
+    _RPAREN  shift, and go to state 37
 
 
 stanje 30
 
-   14 attribute: _TYPE _ID $@5 . _SEMICOLON
+   33 parameter_list: parameters .
+   35 parameters: parameters . _COMMA parameter
 
-    _SEMICOLON  shift, and go to state 36
+    _COMMA  shift, and go to state 38
+
+    $default  reduce using rule 33 (parameter_list)
 
 
 stanje 31
 
-   21 constructor: _ID $@6 _LPAREN . constructor_parameters _RPAREN _LBRACKET attribute_assign_list $@7 _RBRACKET
+   34 parameters: parameter .
 
-    _TYPE  shift, and go to state 37
-
-    $default  reduce using rule 22 (constructor_parameters)
-
-    constructor_parameters           go to state 38
-    constructor_existing_parameters  go to state 39
-    constructor_parameter            go to state 40
+    $default  reduce using rule 34 (parameters)
 
 
 stanje 32
 
-   10 class: _CLASS _ID $@3 _LBRACKET attributes_list constructor $@4 functions_list . _RBRACKET
+   14 attribute: _TYPE _ID $@5 . _SEMICOLON
 
-    _RBRACKET  shift, and go to state 41
+    _SEMICOLON  shift, and go to state 39
 
 
 stanje 33
+
+   21 constructor: _ID $@6 _LPAREN . constructor_parameters _RPAREN _LBRACKET attribute_assign_list $@7 _RBRACKET
+
+    _TYPE  shift, and go to state 40
+
+    $default  reduce using rule 22 (constructor_parameters)
+
+    constructor_parameters           go to state 41
+    constructor_existing_parameters  go to state 42
+    constructor_parameter            go to state 43
+
+
+stanje 34
+
+   10 class: _CLASS _ID $@3 _LBRACKET attributes_list constructor $@4 functions_list . _RBRACKET
+
+    _RBRACKET  shift, and go to state 44
+
+
+stanje 35
 
    16 functions_list: function_list .
    18 function_list: function_list . function
@@ -572,902 +619,1015 @@ stanje 33
     function  go to state 17
 
 
-stanje 34
-
-   33 parameter: _TYPE _ID .
-
-    $default  reduce using rule 33 (parameter)
-
-
-stanje 35
-
-   31 function: _TYPE _ID $@8 _LPAREN parameter _RPAREN . body
-
-    _LBRACKET  shift, and go to state 42
-
-    body  go to state 43
-
-
 stanje 36
+
+   36 parameter: _TYPE _ID .
+
+    $default  reduce using rule 36 (parameter)
+
+
+stanje 37
+
+   31 function: _TYPE _ID $@8 _LPAREN parameter_list _RPAREN . body
+
+    _LBRACKET  shift, and go to state 45
+
+    body  go to state 46
+
+
+stanje 38
+
+   35 parameters: parameters _COMMA . parameter
+
+    _TYPE  shift, and go to state 28
+
+    parameter  go to state 47
+
+
+stanje 39
 
    14 attribute: _TYPE _ID $@5 _SEMICOLON .
 
     $default  reduce using rule 14 (attribute)
 
 
-stanje 37
+stanje 40
 
    26 constructor_parameter: _TYPE . _ID
 
-    _ID  shift, and go to state 44
+    _ID  shift, and go to state 48
 
 
-stanje 38
+stanje 41
 
    21 constructor: _ID $@6 _LPAREN constructor_parameters . _RPAREN _LBRACKET attribute_assign_list $@7 _RBRACKET
 
-    _RPAREN  shift, and go to state 45
+    _RPAREN  shift, and go to state 49
 
 
-stanje 39
+stanje 42
 
    23 constructor_parameters: constructor_existing_parameters .
    25 constructor_existing_parameters: constructor_existing_parameters . _COMMA constructor_parameter
 
-    _COMMA  shift, and go to state 46
+    _COMMA  shift, and go to state 50
 
     $default  reduce using rule 23 (constructor_parameters)
 
 
-stanje 40
+stanje 43
 
    24 constructor_existing_parameters: constructor_parameter .
 
     $default  reduce using rule 24 (constructor_existing_parameters)
 
 
-stanje 41
+stanje 44
 
    10 class: _CLASS _ID $@3 _LBRACKET attributes_list constructor $@4 functions_list _RBRACKET .
 
     $default  reduce using rule 10 (class)
 
 
-stanje 42
+stanje 45
 
-   35 body: _LBRACKET . variable_list $@9 statement_list _RBRACKET
+   38 body: _LBRACKET . variable_list $@9 statement_list _RBRACKET
 
-    $default  reduce using rule 36 (variable_list)
+    $default  reduce using rule 39 (variable_list)
 
-    variable_list  go to state 47
+    variable_list  go to state 51
 
 
-stanje 43
+stanje 46
 
-   31 function: _TYPE _ID $@8 _LPAREN parameter _RPAREN body .
+   31 function: _TYPE _ID $@8 _LPAREN parameter_list _RPAREN body .
 
     $default  reduce using rule 31 (function)
 
 
-stanje 44
+stanje 47
+
+   35 parameters: parameters _COMMA parameter .
+
+    $default  reduce using rule 35 (parameters)
+
+
+stanje 48
 
    26 constructor_parameter: _TYPE _ID .
 
     $default  reduce using rule 26 (constructor_parameter)
 
 
-stanje 45
+stanje 49
 
    21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN . _LBRACKET attribute_assign_list $@7 _RBRACKET
 
-    _LBRACKET  shift, and go to state 48
+    _LBRACKET  shift, and go to state 52
 
 
-stanje 46
+stanje 50
 
    25 constructor_existing_parameters: constructor_existing_parameters _COMMA . constructor_parameter
 
-    _TYPE  shift, and go to state 37
+    _TYPE  shift, and go to state 40
 
-    constructor_parameter  go to state 49
-
-
-stanje 47
-
-   35 body: _LBRACKET variable_list . $@9 statement_list _RBRACKET
-   37 variable_list: variable_list . variable
-
-    _TYPE  shift, and go to state 50
-
-    $default  reduce using rule 34 ($@9)
-
-    $@9       go to state 51
-    variable  go to state 52
+    constructor_parameter  go to state 53
 
 
-stanje 48
+stanje 51
+
+   38 body: _LBRACKET variable_list . $@9 statement_list _RBRACKET
+   40 variable_list: variable_list . variable
+
+    _TYPE  shift, and go to state 54
+
+    $default  reduce using rule 37 ($@9)
+
+    $@9       go to state 55
+    variable  go to state 56
+
+
+stanje 52
 
    21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN _LBRACKET . attribute_assign_list $@7 _RBRACKET
 
     $default  reduce using rule 27 (attribute_assign_list)
 
-    attribute_assign_list  go to state 53
+    attribute_assign_list  go to state 57
 
 
-stanje 49
+stanje 53
 
    25 constructor_existing_parameters: constructor_existing_parameters _COMMA constructor_parameter .
 
     $default  reduce using rule 25 (constructor_existing_parameters)
 
 
-stanje 50
-
-   38 variable: _TYPE . _ID _SEMICOLON
-
-    _ID  shift, and go to state 54
-
-
-stanje 51
-
-   35 body: _LBRACKET variable_list $@9 . statement_list _RBRACKET
-
-    $default  reduce using rule 39 (statement_list)
-
-    statement_list  go to state 55
-
-
-stanje 52
-
-   37 variable_list: variable_list variable .
-
-    $default  reduce using rule 37 (variable_list)
-
-
-stanje 53
-
-   21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list . $@7 _RBRACKET
-   28 attribute_assign_list: attribute_assign_list . attribute_assign
-
-    _ID  shift, and go to state 56
-
-    $default  reduce using rule 20 ($@7)
-
-    $@7               go to state 57
-    attribute_assign  go to state 58
-
-
 stanje 54
 
-   38 variable: _TYPE _ID . _SEMICOLON
+   41 variable: _TYPE . _ID _SEMICOLON
 
-    _SEMICOLON  shift, and go to state 59
+    _ID  shift, and go to state 58
 
 
 stanje 55
 
-   35 body: _LBRACKET variable_list $@9 statement_list . _RBRACKET
-   40 statement_list: statement_list . statement
+   38 body: _LBRACKET variable_list $@9 . statement_list _RBRACKET
 
-    _IF        shift, and go to state 60
-    _RETURN    shift, and go to state 61
-    _CLASS     shift, and go to state 62
-    _ID        shift, and go to state 63
-    _LBRACKET  shift, and go to state 64
-    _RBRACKET  shift, and go to state 65
+    $default  reduce using rule 42 (statement_list)
 
-    statement             go to state 66
-    class_declaration     go to state 67
-    compound_statement    go to state 68
-    assignment_statement  go to state 69
-    if_statement          go to state 70
-    if_part               go to state 71
-    return_statement      go to state 72
+    statement_list  go to state 59
 
 
 stanje 56
 
-   29 attribute_assign: _ID . _ASSIGN _ID _SEMICOLON
+   40 variable_list: variable_list variable .
 
-    _ASSIGN  shift, and go to state 73
+    $default  reduce using rule 40 (variable_list)
 
 
 stanje 57
 
-   21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list $@7 . _RBRACKET
+   21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list . $@7 _RBRACKET
+   28 attribute_assign_list: attribute_assign_list . attribute_assign
 
-    _RBRACKET  shift, and go to state 74
+    _ID  shift, and go to state 60
+
+    $default  reduce using rule 20 ($@7)
+
+    $@7               go to state 61
+    attribute_assign  go to state 62
 
 
 stanje 58
+
+   41 variable: _TYPE _ID . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 63
+
+
+stanje 59
+
+   38 body: _LBRACKET variable_list $@9 statement_list . _RBRACKET
+   43 statement_list: statement_list . statement
+
+    _IF        shift, and go to state 64
+    _RETURN    shift, and go to state 65
+    _CLASS     shift, and go to state 66
+    _ID        shift, and go to state 67
+    _LBRACKET  shift, and go to state 68
+    _RBRACKET  shift, and go to state 69
+
+    statement             go to state 70
+    class_function        go to state 71
+    class_declaration     go to state 72
+    compound_statement    go to state 73
+    assignment_statement  go to state 74
+    if_statement          go to state 75
+    if_part               go to state 76
+    return_statement      go to state 77
+
+
+stanje 60
+
+   29 attribute_assign: _ID . _ASSIGN _ID _SEMICOLON
+
+    _ASSIGN  shift, and go to state 78
+
+
+stanje 61
+
+   21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list $@7 . _RBRACKET
+
+    _RBRACKET  shift, and go to state 79
+
+
+stanje 62
 
    28 attribute_assign_list: attribute_assign_list attribute_assign .
 
     $default  reduce using rule 28 (attribute_assign_list)
 
 
-stanje 59
-
-   38 variable: _TYPE _ID _SEMICOLON .
-
-    $default  reduce using rule 38 (variable)
-
-
-stanje 60
-
-   76 if_part: _IF . _LPAREN @16 rel_exp $@17 _RPAREN statement
-
-    _LPAREN  shift, and go to state 75
-
-
-stanje 61
-
-   78 return_statement: _RETURN . num_exp _SEMICOLON
-
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
-
-    num_exp        go to state 80
-    exp            go to state 81
-    literal        go to state 82
-    function_call  go to state 83
-
-
-stanje 62
-
-   51 class_declaration: _CLASS . _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
-
-    _ID  shift, and go to state 84
-
-
 stanje 63
 
-   58 assignment_statement: _ID . _ASSIGN num_exp _SEMICOLON
+   41 variable: _TYPE _ID _SEMICOLON .
 
-    _ASSIGN  shift, and go to state 85
+    $default  reduce using rule 41 (variable)
 
 
 stanje 64
 
-   57 compound_statement: _LBRACKET . statement_list _RBRACKET
+   85 if_part: _IF . _LPAREN @17 rel_exp $@18 _RPAREN statement
 
-    $default  reduce using rule 39 (statement_list)
-
-    statement_list  go to state 86
+    _LPAREN  shift, and go to state 80
 
 
 stanje 65
 
-   35 body: _LBRACKET variable_list $@9 statement_list _RBRACKET .
+   87 return_statement: _RETURN . num_exp _SEMICOLON
+   88                 | _RETURN . _SEMICOLON
 
-    $default  reduce using rule 35 (body)
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+    _SEMICOLON    shift, and go to state 85
+
+    num_exp        go to state 86
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
 
 
 stanje 66
 
-   40 statement_list: statement_list statement .
+   57 class_declaration: _CLASS . _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
 
-    $default  reduce using rule 40 (statement_list)
+    _ID  shift, and go to state 90
 
 
 stanje 67
 
-   44 statement: class_declaration .
+   51 class_function: _ID . $@10 _DOT function_call _SEMICOLON
+   64 assignment_statement: _ID . _ASSIGN num_exp _SEMICOLON
 
-    $default  reduce using rule 44 (statement)
+    _ASSIGN  shift, and go to state 91
+
+    $default  reduce using rule 50 ($@10)
+
+    $@10  go to state 92
 
 
 stanje 68
 
-   41 statement: compound_statement .
+   63 compound_statement: _LBRACKET . statement_list _RBRACKET
 
-    $default  reduce using rule 41 (statement)
+    $default  reduce using rule 42 (statement_list)
+
+    statement_list  go to state 93
 
 
 stanje 69
 
-   42 statement: assignment_statement .
+   38 body: _LBRACKET variable_list $@9 statement_list _RBRACKET .
 
-    $default  reduce using rule 42 (statement)
+    $default  reduce using rule 38 (body)
 
 
 stanje 70
 
-   43 statement: if_statement .
+   43 statement_list: statement_list statement .
 
-    $default  reduce using rule 43 (statement)
+    $default  reduce using rule 43 (statement_list)
 
 
 stanje 71
 
-   72 if_statement: if_part .
-   73             | if_part . _ELSE statement
-
-    _ELSE  shift, and go to state 87
-
-    $default  reduce using rule 72 (if_statement)
-
-
-stanje 72
-
-   45 statement: return_statement .
+   45 statement: class_function .
 
     $default  reduce using rule 45 (statement)
 
 
+stanje 72
+
+   48 statement: class_declaration .
+
+    $default  reduce using rule 48 (statement)
+
+
 stanje 73
 
-   29 attribute_assign: _ID _ASSIGN . _ID _SEMICOLON
+   44 statement: compound_statement .
 
-    _ID  shift, and go to state 88
+    $default  reduce using rule 44 (statement)
 
 
 stanje 74
+
+   46 statement: assignment_statement .
+
+    $default  reduce using rule 46 (statement)
+
+
+stanje 75
+
+   47 statement: if_statement .
+
+    $default  reduce using rule 47 (statement)
+
+
+stanje 76
+
+   81 if_statement: if_part .
+   82             | if_part . _ELSE statement
+
+    _ELSE  shift, and go to state 94
+
+    $default  reduce using rule 81 (if_statement)
+
+
+stanje 77
+
+   49 statement: return_statement .
+
+    $default  reduce using rule 49 (statement)
+
+
+stanje 78
+
+   29 attribute_assign: _ID _ASSIGN . _ID _SEMICOLON
+
+    _ID  shift, and go to state 95
+
+
+stanje 79
 
    21 constructor: _ID $@6 _LPAREN constructor_parameters _RPAREN _LBRACKET attribute_assign_list $@7 _RBRACKET .
 
     $default  reduce using rule 21 (constructor)
 
 
-stanje 75
-
-   76 if_part: _IF _LPAREN . @16 rel_exp $@17 _RPAREN statement
-
-    $default  reduce using rule 74 (@16)
-
-    @16  go to state 89
-
-
-stanje 76
-
-   62 exp: _ID . _DOT function_call
-   63    | _ID .
-   69 function_call: _ID . $@15 _LPAREN argument _RPAREN
-
-    _DOT  shift, and go to state 90
-
-    _LPAREN   reduce using rule 68 ($@15)
-    $default  reduce using rule 63 (exp)
-
-    $@15  go to state 91
-
-
-stanje 77
-
-   66 literal: _INT_NUMBER .
-
-    $default  reduce using rule 66 (literal)
-
-
-stanje 78
-
-   67 literal: _UINT_NUMBER .
-
-    $default  reduce using rule 67 (literal)
-
-
-stanje 79
-
-   65 exp: _LPAREN . num_exp _RPAREN
-
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
-
-    num_exp        go to state 92
-    exp            go to state 81
-    literal        go to state 82
-    function_call  go to state 83
-
-
 stanje 80
 
-   60 num_exp: num_exp . _AROP exp
-   78 return_statement: _RETURN num_exp . _SEMICOLON
+   85 if_part: _IF _LPAREN . @17 rel_exp $@18 _RPAREN statement
 
-    _SEMICOLON  shift, and go to state 93
-    _AROP       shift, and go to state 94
+    $default  reduce using rule 83 (@17)
+
+    @17  go to state 96
 
 
 stanje 81
 
-   59 num_exp: exp .
+   68 exp: _ID . _DOT function_call
+   69    | _ID .
+   75 function_call: _ID . $@16 _LPAREN argument_list _RPAREN
 
-    $default  reduce using rule 59 (num_exp)
+    _DOT  shift, and go to state 97
+
+    _LPAREN   reduce using rule 74 ($@16)
+    $default  reduce using rule 69 (exp)
+
+    $@16  go to state 98
 
 
 stanje 82
 
-   61 exp: literal .
+   72 literal: _INT_NUMBER .
 
-    $default  reduce using rule 61 (exp)
+    $default  reduce using rule 72 (literal)
 
 
 stanje 83
 
-   64 exp: function_call .
+   73 literal: _UINT_NUMBER .
 
-    $default  reduce using rule 64 (exp)
+    $default  reduce using rule 73 (literal)
 
 
 stanje 84
 
-   51 class_declaration: _CLASS _ID . $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   71 exp: _LPAREN . num_exp _RPAREN
 
-    $default  reduce using rule 46 ($@10)
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
 
-    $@10  go to state 95
+    num_exp        go to state 99
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
 
 
 stanje 85
 
-   58 assignment_statement: _ID _ASSIGN . num_exp _SEMICOLON
+   88 return_statement: _RETURN _SEMICOLON .
 
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
-
-    num_exp        go to state 96
-    exp            go to state 81
-    literal        go to state 82
-    function_call  go to state 83
+    $default  reduce using rule 88 (return_statement)
 
 
 stanje 86
 
-   40 statement_list: statement_list . statement
-   57 compound_statement: _LBRACKET statement_list . _RBRACKET
+   66 num_exp: num_exp . _AROP exp
+   87 return_statement: _RETURN num_exp . _SEMICOLON
 
-    _IF        shift, and go to state 60
-    _RETURN    shift, and go to state 61
-    _CLASS     shift, and go to state 62
-    _ID        shift, and go to state 63
-    _LBRACKET  shift, and go to state 64
-    _RBRACKET  shift, and go to state 97
-
-    statement             go to state 66
-    class_declaration     go to state 67
-    compound_statement    go to state 68
-    assignment_statement  go to state 69
-    if_statement          go to state 70
-    if_part               go to state 71
-    return_statement      go to state 72
+    _SEMICOLON  shift, and go to state 100
+    _AROP       shift, and go to state 101
 
 
 stanje 87
 
-   73 if_statement: if_part _ELSE . statement
+   65 num_exp: exp .
 
-    _IF        shift, and go to state 60
-    _RETURN    shift, and go to state 61
-    _CLASS     shift, and go to state 62
-    _ID        shift, and go to state 63
-    _LBRACKET  shift, and go to state 64
-
-    statement             go to state 98
-    class_declaration     go to state 67
-    compound_statement    go to state 68
-    assignment_statement  go to state 69
-    if_statement          go to state 70
-    if_part               go to state 71
-    return_statement      go to state 72
+    $default  reduce using rule 65 (num_exp)
 
 
 stanje 88
 
-   29 attribute_assign: _ID _ASSIGN _ID . _SEMICOLON
+   67 exp: literal .
 
-    _SEMICOLON  shift, and go to state 99
+    $default  reduce using rule 67 (exp)
 
 
 stanje 89
 
-   76 if_part: _IF _LPAREN @16 . rel_exp $@17 _RPAREN statement
+   70 exp: function_call .
 
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
-
-    num_exp        go to state 100
-    exp            go to state 81
-    literal        go to state 82
-    function_call  go to state 83
-    rel_exp        go to state 101
+    $default  reduce using rule 70 (exp)
 
 
 stanje 90
 
-   62 exp: _ID _DOT . function_call
+   57 class_declaration: _CLASS _ID . $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
 
-    _ID  shift, and go to state 102
+    $default  reduce using rule 52 ($@11)
 
-    function_call  go to state 103
+    $@11  go to state 102
 
 
 stanje 91
 
-   69 function_call: _ID $@15 . _LPAREN argument _RPAREN
+   64 assignment_statement: _ID _ASSIGN . num_exp _SEMICOLON
 
-    _LPAREN  shift, and go to state 104
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    num_exp        go to state 103
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
 
 
 stanje 92
 
-   60 num_exp: num_exp . _AROP exp
-   65 exp: _LPAREN num_exp . _RPAREN
+   51 class_function: _ID $@10 . _DOT function_call _SEMICOLON
 
-    _RPAREN  shift, and go to state 105
-    _AROP    shift, and go to state 94
+    _DOT  shift, and go to state 104
 
 
 stanje 93
 
-   78 return_statement: _RETURN num_exp _SEMICOLON .
+   43 statement_list: statement_list . statement
+   63 compound_statement: _LBRACKET statement_list . _RBRACKET
 
-    $default  reduce using rule 78 (return_statement)
+    _IF        shift, and go to state 64
+    _RETURN    shift, and go to state 65
+    _CLASS     shift, and go to state 66
+    _ID        shift, and go to state 67
+    _LBRACKET  shift, and go to state 68
+    _RBRACKET  shift, and go to state 105
+
+    statement             go to state 70
+    class_function        go to state 71
+    class_declaration     go to state 72
+    compound_statement    go to state 73
+    assignment_statement  go to state 74
+    if_statement          go to state 75
+    if_part               go to state 76
+    return_statement      go to state 77
 
 
 stanje 94
 
-   60 num_exp: num_exp _AROP . exp
+   82 if_statement: if_part _ELSE . statement
 
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
+    _IF        shift, and go to state 64
+    _RETURN    shift, and go to state 65
+    _CLASS     shift, and go to state 66
+    _ID        shift, and go to state 67
+    _LBRACKET  shift, and go to state 68
 
-    exp            go to state 106
-    literal        go to state 82
-    function_call  go to state 83
+    statement             go to state 106
+    class_function        go to state 71
+    class_declaration     go to state 72
+    compound_statement    go to state 73
+    assignment_statement  go to state 74
+    if_statement          go to state 75
+    if_part               go to state 76
+    return_statement      go to state 77
 
 
 stanje 95
 
-   51 class_declaration: _CLASS _ID $@10 . _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   29 attribute_assign: _ID _ASSIGN _ID . _SEMICOLON
 
-    _ID  shift, and go to state 107
+    _SEMICOLON  shift, and go to state 107
 
 
 stanje 96
 
-   58 assignment_statement: _ID _ASSIGN num_exp . _SEMICOLON
-   60 num_exp: num_exp . _AROP exp
+   85 if_part: _IF _LPAREN @17 . rel_exp $@18 _RPAREN statement
 
-    _SEMICOLON  shift, and go to state 108
-    _AROP       shift, and go to state 94
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    num_exp        go to state 108
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
+    rel_exp        go to state 109
 
 
 stanje 97
 
-   57 compound_statement: _LBRACKET statement_list _RBRACKET .
+   68 exp: _ID _DOT . function_call
 
-    $default  reduce using rule 57 (compound_statement)
+    _ID  shift, and go to state 110
+
+    function_call  go to state 111
 
 
 stanje 98
 
-   73 if_statement: if_part _ELSE statement .
+   75 function_call: _ID $@16 . _LPAREN argument_list _RPAREN
 
-    $default  reduce using rule 73 (if_statement)
+    _LPAREN  shift, and go to state 112
 
 
 stanje 99
+
+   66 num_exp: num_exp . _AROP exp
+   71 exp: _LPAREN num_exp . _RPAREN
+
+    _RPAREN  shift, and go to state 113
+    _AROP    shift, and go to state 101
+
+
+stanje 100
+
+   87 return_statement: _RETURN num_exp _SEMICOLON .
+
+    $default  reduce using rule 87 (return_statement)
+
+
+stanje 101
+
+   66 num_exp: num_exp _AROP . exp
+
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    exp            go to state 114
+    literal        go to state 88
+    function_call  go to state 89
+
+
+stanje 102
+
+   57 class_declaration: _CLASS _ID $@11 . _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
+
+    _ID  shift, and go to state 115
+
+
+stanje 103
+
+   64 assignment_statement: _ID _ASSIGN num_exp . _SEMICOLON
+   66 num_exp: num_exp . _AROP exp
+
+    _SEMICOLON  shift, and go to state 116
+    _AROP       shift, and go to state 101
+
+
+stanje 104
+
+   51 class_function: _ID $@10 _DOT . function_call _SEMICOLON
+
+    _ID  shift, and go to state 110
+
+    function_call  go to state 117
+
+
+stanje 105
+
+   63 compound_statement: _LBRACKET statement_list _RBRACKET .
+
+    $default  reduce using rule 63 (compound_statement)
+
+
+stanje 106
+
+   82 if_statement: if_part _ELSE statement .
+
+    $default  reduce using rule 82 (if_statement)
+
+
+stanje 107
 
    29 attribute_assign: _ID _ASSIGN _ID _SEMICOLON .
 
     $default  reduce using rule 29 (attribute_assign)
 
 
-stanje 100
-
-   60 num_exp: num_exp . _AROP exp
-   77 rel_exp: num_exp . _RELOP num_exp
-
-    _AROP   shift, and go to state 94
-    _RELOP  shift, and go to state 109
-
-
-stanje 101
-
-   76 if_part: _IF _LPAREN @16 rel_exp . $@17 _RPAREN statement
-
-    $default  reduce using rule 75 ($@17)
-
-    $@17  go to state 110
-
-
-stanje 102
-
-   69 function_call: _ID . $@15 _LPAREN argument _RPAREN
-
-    $default  reduce using rule 68 ($@15)
-
-    $@15  go to state 91
-
-
-stanje 103
-
-   62 exp: _ID _DOT function_call .
-
-    $default  reduce using rule 62 (exp)
-
-
-stanje 104
-
-   69 function_call: _ID $@15 _LPAREN . argument _RPAREN
-
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
-
-    $default  reduce using rule 70 (argument)
-
-    num_exp        go to state 111
-    exp            go to state 81
-    literal        go to state 82
-    function_call  go to state 83
-    argument       go to state 112
-
-
-stanje 105
-
-   65 exp: _LPAREN num_exp _RPAREN .
-
-    $default  reduce using rule 65 (exp)
-
-
-stanje 106
-
-   60 num_exp: num_exp _AROP exp .
-
-    $default  reduce using rule 60 (num_exp)
-
-
-stanje 107
-
-   51 class_declaration: _CLASS _ID $@10 _ID . $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
-
-    $default  reduce using rule 47 ($@11)
-
-    $@11  go to state 113
-
-
 stanje 108
 
-   58 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON .
+   66 num_exp: num_exp . _AROP exp
+   86 rel_exp: num_exp . _RELOP num_exp
 
-    $default  reduce using rule 58 (assignment_statement)
+    _AROP   shift, and go to state 101
+    _RELOP  shift, and go to state 118
 
 
 stanje 109
 
-   77 rel_exp: num_exp _RELOP . num_exp
+   85 if_part: _IF _LPAREN @17 rel_exp . $@18 _RPAREN statement
 
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
+    $default  reduce using rule 84 ($@18)
 
-    num_exp        go to state 114
-    exp            go to state 81
-    literal        go to state 82
-    function_call  go to state 83
+    $@18  go to state 119
 
 
 stanje 110
 
-   76 if_part: _IF _LPAREN @16 rel_exp $@17 . _RPAREN statement
+   75 function_call: _ID . $@16 _LPAREN argument_list _RPAREN
 
-    _RPAREN  shift, and go to state 115
+    $default  reduce using rule 74 ($@16)
+
+    $@16  go to state 98
 
 
 stanje 111
 
-   60 num_exp: num_exp . _AROP exp
-   71 argument: num_exp .
+   68 exp: _ID _DOT function_call .
 
-    _AROP  shift, and go to state 94
-
-    $default  reduce using rule 71 (argument)
+    $default  reduce using rule 68 (exp)
 
 
 stanje 112
 
-   69 function_call: _ID $@15 _LPAREN argument . _RPAREN
+   75 function_call: _ID $@16 _LPAREN . argument_list _RPAREN
 
-    _RPAREN  shift, and go to state 116
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    $default  reduce using rule 76 (argument_list)
+
+    num_exp        go to state 120
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
+    argument_list  go to state 121
+    arguments      go to state 122
+    argument       go to state 123
 
 
 stanje 113
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 . _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   71 exp: _LPAREN num_exp _RPAREN .
 
-    _ASSIGN  shift, and go to state 117
+    $default  reduce using rule 71 (exp)
 
 
 stanje 114
 
-   60 num_exp: num_exp . _AROP exp
-   77 rel_exp: num_exp _RELOP num_exp .
+   66 num_exp: num_exp _AROP exp .
 
-    _AROP  shift, and go to state 94
-
-    $default  reduce using rule 77 (rel_exp)
+    $default  reduce using rule 66 (num_exp)
 
 
 stanje 115
 
-   76 if_part: _IF _LPAREN @16 rel_exp $@17 _RPAREN . statement
+   57 class_declaration: _CLASS _ID $@11 _ID . $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
 
-    _IF        shift, and go to state 60
-    _RETURN    shift, and go to state 61
-    _CLASS     shift, and go to state 62
-    _ID        shift, and go to state 63
-    _LBRACKET  shift, and go to state 64
+    $default  reduce using rule 53 ($@12)
 
-    statement             go to state 118
-    class_declaration     go to state 67
-    compound_statement    go to state 68
-    assignment_statement  go to state 69
-    if_statement          go to state 70
-    if_part               go to state 71
-    return_statement      go to state 72
+    $@12  go to state 124
 
 
 stanje 116
 
-   69 function_call: _ID $@15 _LPAREN argument _RPAREN .
+   64 assignment_statement: _ID _ASSIGN num_exp _SEMICOLON .
 
-    $default  reduce using rule 69 (function_call)
+    $default  reduce using rule 64 (assignment_statement)
 
 
 stanje 117
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN . _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   51 class_function: _ID $@10 _DOT function_call . _SEMICOLON
 
-    _NEW  shift, and go to state 119
+    _SEMICOLON  shift, and go to state 125
 
 
 stanje 118
 
-   76 if_part: _IF _LPAREN @16 rel_exp $@17 _RPAREN statement .
+   86 rel_exp: num_exp _RELOP . num_exp
 
-    $default  reduce using rule 76 (if_part)
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    num_exp        go to state 126
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
 
 
 stanje 119
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW . _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   85 if_part: _IF _LPAREN @17 rel_exp $@18 . _RPAREN statement
 
-    _ID  shift, and go to state 120
+    _RPAREN  shift, and go to state 127
 
 
 stanje 120
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID . $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   66 num_exp: num_exp . _AROP exp
+   80 argument: num_exp .
 
-    $default  reduce using rule 48 ($@12)
+    _AROP  shift, and go to state 101
 
-    $@12  go to state 121
+    $default  reduce using rule 80 (argument)
 
 
 stanje 121
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 . _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   75 function_call: _ID $@16 _LPAREN argument_list . _RPAREN
 
-    _LPAREN  shift, and go to state 122
+    _RPAREN  shift, and go to state 128
 
 
 stanje 122
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN . $@13 class_argument_list $@14 _RPAREN _SEMICOLON
+   77 argument_list: arguments .
+   79 arguments: arguments . _COMMA argument
 
-    $default  reduce using rule 49 ($@13)
+    _COMMA  shift, and go to state 129
 
-    $@13  go to state 123
+    $default  reduce using rule 77 (argument_list)
 
 
 stanje 123
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 . class_argument_list $@14 _RPAREN _SEMICOLON
+   78 arguments: argument .
 
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
-
-    $default  reduce using rule 52 (class_argument_list)
-
-    class_argument_list  go to state 124
-    class_arguments      go to state 125
-    class_argument       go to state 126
-    num_exp              go to state 127
-    exp                  go to state 81
-    literal              go to state 82
-    function_call        go to state 83
+    $default  reduce using rule 78 (arguments)
 
 
 stanje 124
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list . $@14 _RPAREN _SEMICOLON
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 . _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
 
-    $default  reduce using rule 50 ($@14)
-
-    $@14  go to state 128
+    _ASSIGN  shift, and go to state 130
 
 
 stanje 125
 
-   53 class_argument_list: class_arguments .
-   55 class_arguments: class_arguments . _COMMA class_argument
+   51 class_function: _ID $@10 _DOT function_call _SEMICOLON .
 
-    _COMMA  shift, and go to state 129
-
-    $default  reduce using rule 53 (class_argument_list)
+    $default  reduce using rule 51 (class_function)
 
 
 stanje 126
 
-   54 class_arguments: class_argument .
+   66 num_exp: num_exp . _AROP exp
+   86 rel_exp: num_exp _RELOP num_exp .
 
-    $default  reduce using rule 54 (class_arguments)
+    _AROP  shift, and go to state 101
+
+    $default  reduce using rule 86 (rel_exp)
 
 
 stanje 127
 
-   56 class_argument: num_exp .
-   60 num_exp: num_exp . _AROP exp
+   85 if_part: _IF _LPAREN @17 rel_exp $@18 _RPAREN . statement
 
-    _AROP  shift, and go to state 94
+    _IF        shift, and go to state 64
+    _RETURN    shift, and go to state 65
+    _CLASS     shift, and go to state 66
+    _ID        shift, and go to state 67
+    _LBRACKET  shift, and go to state 68
 
-    $default  reduce using rule 56 (class_argument)
+    statement             go to state 131
+    class_function        go to state 71
+    class_declaration     go to state 72
+    compound_statement    go to state 73
+    assignment_statement  go to state 74
+    if_statement          go to state 75
+    if_part               go to state 76
+    return_statement      go to state 77
 
 
 stanje 128
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 . _RPAREN _SEMICOLON
+   75 function_call: _ID $@16 _LPAREN argument_list _RPAREN .
 
-    _RPAREN  shift, and go to state 130
+    $default  reduce using rule 75 (function_call)
 
 
 stanje 129
 
-   55 class_arguments: class_arguments _COMMA . class_argument
+   79 arguments: arguments _COMMA . argument
 
-    _ID           shift, and go to state 76
-    _INT_NUMBER   shift, and go to state 77
-    _UINT_NUMBER  shift, and go to state 78
-    _LPAREN       shift, and go to state 79
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
 
-    class_argument  go to state 131
-    num_exp         go to state 127
-    exp             go to state 81
-    literal         go to state 82
-    function_call   go to state 83
+    num_exp        go to state 120
+    exp            go to state 87
+    literal        go to state 88
+    function_call  go to state 89
+    argument       go to state 132
 
 
 stanje 130
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN . _SEMICOLON
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN . _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
 
-    _SEMICOLON  shift, and go to state 132
+    _NEW  shift, and go to state 133
 
 
 stanje 131
 
-   55 class_arguments: class_arguments _COMMA class_argument .
+   85 if_part: _IF _LPAREN @17 rel_exp $@18 _RPAREN statement .
 
-    $default  reduce using rule 55 (class_arguments)
+    $default  reduce using rule 85 (if_part)
 
 
 stanje 132
 
-   51 class_declaration: _CLASS _ID $@10 _ID $@11 _ASSIGN _NEW _ID $@12 _LPAREN $@13 class_argument_list $@14 _RPAREN _SEMICOLON .
+   79 arguments: arguments _COMMA argument .
 
-    $default  reduce using rule 51 (class_declaration)
+    $default  reduce using rule 79 (arguments)
+
+
+stanje 133
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW . _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
+
+    _ID  shift, and go to state 134
+
+
+stanje 134
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID . $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
+
+    $default  reduce using rule 54 ($@13)
+
+    $@13  go to state 135
+
+
+stanje 135
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 . _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON
+
+    _LPAREN  shift, and go to state 136
+
+
+stanje 136
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN . $@14 class_argument_list $@15 _RPAREN _SEMICOLON
+
+    $default  reduce using rule 55 ($@14)
+
+    $@14  go to state 137
+
+
+stanje 137
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 . class_argument_list $@15 _RPAREN _SEMICOLON
+
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    $default  reduce using rule 58 (class_argument_list)
+
+    class_argument_list  go to state 138
+    class_arguments      go to state 139
+    class_argument       go to state 140
+    num_exp              go to state 141
+    exp                  go to state 87
+    literal              go to state 88
+    function_call        go to state 89
+
+
+stanje 138
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list . $@15 _RPAREN _SEMICOLON
+
+    $default  reduce using rule 56 ($@15)
+
+    $@15  go to state 142
+
+
+stanje 139
+
+   59 class_argument_list: class_arguments .
+   61 class_arguments: class_arguments . _COMMA class_argument
+
+    _COMMA  shift, and go to state 143
+
+    $default  reduce using rule 59 (class_argument_list)
+
+
+stanje 140
+
+   60 class_arguments: class_argument .
+
+    $default  reduce using rule 60 (class_arguments)
+
+
+stanje 141
+
+   62 class_argument: num_exp .
+   66 num_exp: num_exp . _AROP exp
+
+    _AROP  shift, and go to state 101
+
+    $default  reduce using rule 62 (class_argument)
+
+
+stanje 142
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 . _RPAREN _SEMICOLON
+
+    _RPAREN  shift, and go to state 144
+
+
+stanje 143
+
+   61 class_arguments: class_arguments _COMMA . class_argument
+
+    _ID           shift, and go to state 81
+    _INT_NUMBER   shift, and go to state 82
+    _UINT_NUMBER  shift, and go to state 83
+    _LPAREN       shift, and go to state 84
+
+    class_argument  go to state 145
+    num_exp         go to state 141
+    exp             go to state 87
+    literal         go to state 88
+    function_call   go to state 89
+
+
+stanje 144
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN . _SEMICOLON
+
+    _SEMICOLON  shift, and go to state 146
+
+
+stanje 145
+
+   61 class_arguments: class_arguments _COMMA class_argument .
+
+    $default  reduce using rule 61 (class_arguments)
+
+
+stanje 146
+
+   57 class_declaration: _CLASS _ID $@11 _ID $@12 _ASSIGN _NEW _ID $@13 _LPAREN $@14 class_argument_list $@15 _RPAREN _SEMICOLON .
+
+    $default  reduce using rule 57 (class_declaration)
