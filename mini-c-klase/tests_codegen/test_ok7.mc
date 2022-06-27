@@ -50,6 +50,6 @@ int main() {
 	add = 5;
 	
 	class Person personInstance = new Person(a,h,w,s);
-    	personInstance.setAgeHeight(24,179);
+    personInstance.setAgeHeight(24,179);
 	return personInstance.getSumPlusFive(add);
 }
